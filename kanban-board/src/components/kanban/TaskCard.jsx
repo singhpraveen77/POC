@@ -30,6 +30,8 @@ export default function TaskCard({ task, isDone = false, onClick }) {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0 : 1,
+    touchAction: 'none',   // Critical: prevents browser scroll from swallowing touch events
+    userSelect: 'none',    // Prevents text selection interfering with drag on mobile
   }
 
   return (

@@ -16,10 +16,9 @@ export default function KanbanColumn({ columnId, title, tasks, onCardClick, acti
 
   return (
     <div
-      className="flex-shrink flex flex-col rounded-xl border min-w-0"
+      className="flex-shrink-0 flex flex-col rounded-xl border"
       style={{
-        width: '100%',
-        flex: '1 1 auto',
+        width: 'clamp(240px, 75vw, 300px)', // Fixed width per column: 75vw on mobile, 300px on desktop
         height: '100%',
         minHeight: 0,
         borderStyle: isDone ? 'dashed' : 'solid',

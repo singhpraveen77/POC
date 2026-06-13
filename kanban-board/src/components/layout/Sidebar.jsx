@@ -93,12 +93,7 @@ export default function Sidebar({ isOpen, onClose, onCreateTask }) {
 
       {/* Footer */}
       <ul className="list-none m-0 p-0 border-t border-[var(--color-outline-variant)] pt-3 flex flex-col gap-0.5">
-        <li>
-          <button type="button" className="nav-btn w-full">
-            <span className="material-symbols-outlined">help</span>
-            Help Center
-          </button>
-        </li>
+       
         <li>
           <button type="button" className="nav-btn w-full text-red-500 hover:bg-red-500/10" onClick={handleLogout}>
             <span className="material-symbols-outlined">logout</span>

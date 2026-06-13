@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   DndContext, DragOverlay,
-  PointerSensor, KeyboardSensor, TouchSensor,
+  MouseSensor, KeyboardSensor, TouchSensor,
   closestCorners, useSensor, useSensors,
 } from '@dnd-kit/core'
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable'
@@ -41,8 +41,10 @@ export default function KanbanBoard() {
 
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 10 } }),
+    // MouseSensor for desktop — 8px distance threshold prevents accidental drags on click
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    // TouchSensor for mobile — 250ms hold + 5px tolerance prevents conflict with page scroll
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
   const activeTask = activeId ? tasks.find(t => t.id === activeId) : null
@@ -75,31 +77,43 @@ export default function KanbanBoard() {
     /* This div must fill the flex column from Layout */
     <div className="flex flex-col flex-1 min-h-0 bg-[var(--color-background)] overflow-hidden">
       <div aria-live="assertive" aria-atomic="true" style={{ position: 'absolute', left: -9999 }}>{announcement}</div>
-      
-      {/* Kanban canvas - Horizontal scroll layout for all screens */}
+
+      {/* Board header */}
+      <div className="flex-shrink-0 px-4 py-3 bg-[var(--color-surface)] border-b border-[var(--color-outline-variant)] flex items-center justify-between gap-3">
+        <div className="flex flex-col gap-0.5">
+          <h1 className="text-lg font-bold text-[var(--color-on-surface)] m-0">Q3 Product Launch</h1>
+          <p className="text-[12px] text-[var(--color-on-surface-variant)]">4 columns · {tasks.length} tasks</p>
+        </div>
+        <button
+          onClick={() => { setPresetStatus('todo'); setIsCreateModalOpen(true) }}
+          className="btn btn-solid flex items-center gap-1.5 text-sm px-4 py-2"
+        >
+          <span className="material-symbols-outlined text-[16px]">add</span>
+          <span>New Task</span>
+        </button>
+      </div>
+
+      {/* Kanban canvas */}
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <div className="flex-1 h-full overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-hidden">
           <div
-            className="flex h-full overflow-x-auto scrollbar-thin px-2 sm:px-4 py-2 sm:py-4 gap-2 sm:gap-4"
+            className="flex h-full overflow-x-auto scrollbar-thin px-3 sm:px-4 py-3 sm:py-4 gap-3 sm:gap-4"
             style={{
-              maxHeight: '100%',
-              // Ensure smooth scrolling
-              scrollBehavior: 'smooth',
+              overscrollBehaviorX: 'contain', // Prevents browser from taking over horizontal scroll during drag
+              WebkitOverflowScrolling: 'touch', // Smooth inertia scroll on iOS
             }}
           >
-            {/* Wrap columns in container that maintains column width */}
-            <div className="flex gap-2 sm:gap-4 min-w-max">
-              {COLUMNS.map(col => (
-                <KanbanColumn
-                  key={col.id}
-                  columnId={col.id}
-                  title={col.title}
-                  tasks={tasks.filter(t => t.status === col.id)}
-                  activeId={activeId}
-                  onCardClick={id => setDrawerTaskId(id)}
-                />
-              ))}
-            </div>
+            {/* Each column has a fixed width so they sit side-by-side at all screen sizes */}
+            {COLUMNS.map(col => (
+              <KanbanColumn
+                key={col.id}
+                columnId={col.id}
+                title={col.title}
+                tasks={tasks.filter(t => t.status === col.id)}
+                activeId={activeId}
+                onCardClick={id => setDrawerTaskId(id)}
+              />
+            ))}
           </div>
         </div>
 
