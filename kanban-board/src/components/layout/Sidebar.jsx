@@ -80,37 +80,29 @@ export default function Sidebar({ isOpen, onClose, onCreateTask }) {
       </ul>
 
       {/* Create Task button */}
-      <div style={{ padding: '8px 0', marginTop: 8 }}>
-        <Button
-          variant="solid"
-          icon="add"
+      <div className="py-2 mt-2">
+        <button
+          type="button"
+          className="btn btn-solid w-full flex justify-center py-2.5"
           onClick={() => { onCreateTask(); onClose() }}
-          style={{ width: '100%', justifyContent: 'center' }}
         >
+          <span className="material-symbols-outlined text-[20px]">add</span>
           Create Task
-        </Button>
+        </button>
       </div>
 
       {/* Footer */}
-      <ul style={{
-        listStyle: 'none', margin: 0, padding: '12px 0 0',
-        borderTop: '1px solid var(--color-outline-variant)',
-        display: 'flex', flexDirection: 'column', gap: 2,
-      }}>
+      <ul className="list-none m-0 p-0 border-t border-[var(--color-outline-variant)] pt-3 flex flex-col gap-0.5">
         <li>
-          <a
-            href="#"
-            className="nav-btn"
-            style={{ textDecoration: 'none' }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>help</span>
-            Help
-          </a>
+          <button type="button" className="nav-btn w-full">
+            <span className="material-symbols-outlined">help</span>
+            Help Center
+          </button>
         </li>
         <li>
-          <button type="button" className="nav-btn" onClick={handleLogout}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>logout</span>
-            Logout
+          <button type="button" className="nav-btn w-full text-red-500 hover:bg-red-500/10" onClick={handleLogout}>
+            <span className="material-symbols-outlined">logout</span>
+            Logout Account
           </button>
         </li>
       </ul>

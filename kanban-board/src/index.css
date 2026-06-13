@@ -230,6 +230,68 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-on-surface-variant);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+  background-color: var(--color-surface-container-high);
+  color: var(--color-on-surface);
+}
+
+.nav-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-solid {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: 0 2px 4px rgba(0, 88, 190, 0.2);
+}
+
+.btn-solid:hover {
+  background-color: var(--color-primary-container);
+  box-shadow: 0 4px 12px rgba(0, 88, 190, 0.3);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--color-outline-variant);
+  color: var(--color-on-surface-variant);
+}
+
+.btn-outline:hover {
+  background-color: var(--color-surface-container-low);
+  border-color: var(--color-outline);
+  color: var(--color-on-surface);
+}
+
 /* ── Transitions ──────────────────────────────── */
 * {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
