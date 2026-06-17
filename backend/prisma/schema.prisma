@@ -15,17 +15,24 @@ enum WorkspaceRole {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
+  id String @id @default(uuid())
+
+  name String
+
+  username String @unique
+  email String @unique
+
+  password String
+
+  isVerified Boolean @default(false)
+
+  emailVerificationToken String?
+  emailVerificationExpire DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   memberships WorkspaceMember[]
-
-  @@map("users")
 }
 
 model Workspace {
