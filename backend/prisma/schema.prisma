@@ -14,55 +14,193 @@ enum WorkspaceRole {
   VIEWER
 }
 
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+}
+
 model User {
+  // Identity
   id String @id @default(uuid())
 
-  name String
-
+  // Basic Information
+  name     String
   username String @unique
-  email String @unique
+  email    String @unique
 
-  password String
+  // Authentication
+  password                  String
+  isVerified                Boolean   @default(false)
+  emailVerificationToken    String?
+  emailVerificationExpire   DateTime?
 
-  isVerified Boolean @default(false)
+  // Relations
+  memberships   WorkspaceMember[]
 
-  emailVerificationToken String?
-  emailVerificationExpire DateTime?
+  boardsCreated Board[] @relation("BoardCreator")
 
+  tasksCreated  Task[]  @relation("TaskCreator")
+  assignedTasks Task[]  @relation("TaskAssignee")
+
+  // Audit
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  memberships WorkspaceMember[]
+  @@map("users")
 }
 
 model Workspace {
-  id        String   @id @default(uuid())
-  name      String
-  slug      String   @unique
+  // Identity
+  id String @id @default(uuid())
 
+  // Information
+  name String
+  slug String @unique
+
+  // Relations
+  members WorkspaceMember[]
+  boards  Board[]
+
+  // Audit
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  members   WorkspaceMember[]
 
   @@map("workspaces")
 }
 
 model WorkspaceMember {
+  // Foreign Keys
   workspaceId String
   userId      String
 
-  role        WorkspaceRole
-  joinedAt    DateTime @default(now())
+  // Information
+  role     WorkspaceRole
+  joinedAt DateTime @default(now())
 
-  workspace Workspace @relation(fields: [workspaceId],references: [id],onDelete: Cascade)
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
-
+  // Constraints
   @@id([workspaceId, userId])
 
+  // Indexes
   @@index([workspaceId])
   @@index([userId])
 
   @@map("workspace_members")
+}
+
+model Board {
+  // Identity
+  id String @id @default(uuid())
+
+  // Information
+  name        String
+  description String?
+
+  position Int @default(0)
+
+  // Foreign Keys
+  workspaceId String
+  createdById String
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy User @relation("BoardCreator", fields: [createdById], references: [id])
+
+  columns Column[]
+
+  // Audit
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Indexes
+  @@index([workspaceId])
+  @@index([createdById])
+
+  @@map("boards")
+}
+
+model Column {
+  // Identity
+  id String @id @default(uuid())
+
+  // Information
+  name     String
+  position Int @default(0)
+
+  // Foreign Key
+  boardId String
+
+  // Relations
+  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  tasks Task[]
+
+  // Audit
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Indexes
+  @@index([boardId])
+
+  @@map("columns")
+}
+
+model Task {
+  // Identity
+  id String @id @default(uuid())
+
+  // Information
+  title       String
+  description String?
+
+  status   TaskStatus   @default(TODO)
+  priority TaskPriority @default(MEDIUM)
+
+  progress Int @default(0)
+
+  startDate DateTime?
+  dueDate   DateTime?
+
+  position Int @default(0)
+
+  estimatedHours Int?
+  actualHours    Int?
+
+  // Foreign Keys
+  columnId    String
+  createdById String
+  assigneeId  String?
+
+  // Relations
+  column    Column @relation(fields: [columnId], references: [id], onDelete: Cascade)
+
+  creator   User   @relation("TaskCreator", fields: [createdById], references: [id])
+
+  assignee  User?  @relation("TaskAssignee", fields: [assigneeId], references: [id])
+
+  // Audit
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Indexes
+  @@index([columnId])
+  @@index([createdById])
+  @@index([assigneeId])
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+
+  @@map("tasks")
 }
