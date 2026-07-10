@@ -29,21 +29,21 @@ enum TaskStatus {
 }
 
 model User {
-  // Identity
+  // identity
   id String @id @default(uuid())
 
-  // Basic Information
+  // basic
   name     String
   username String @unique
   email    String @unique
 
-  // Authentication
+  // auth
   password                  String
   isVerified                Boolean   @default(false)
   emailVerificationToken    String?
   emailVerificationExpire   DateTime?
 
-  // Relations
+  // relation
   memberships   WorkspaceMember[]
 
   boardsCreated Board[] @relation("BoardCreator")
@@ -51,7 +51,7 @@ model User {
   tasksCreated  Task[]  @relation("TaskCreator")
   assignedTasks Task[]  @relation("TaskAssignee")
 
-  // Audit
+  // audit
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -59,18 +59,18 @@ model User {
 }
 
 model Workspace {
-  // Identity
+  // identity
   id String @id @default(uuid())
 
-  // Information
+  // basic
   name String
   slug String @unique
 
-  // Relations
+  // relations
   members WorkspaceMember[]
   boards  Board[]
 
-  // Audit
+  // audit
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -79,22 +79,22 @@ model Workspace {
 
 
 model WorkspaceMember {
-  // Foreign Keys
+  // foreign key
   workspaceId String
   userId      String
 
-  // Information
+  // info
   role     WorkspaceRole
   joinedAt DateTime @default(now())
 
-  // Relations
+  // relation
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Constraints
+  // constraint
   @@id([workspaceId, userId])
 
-  // Indexes
+  // indexes
   @@index([workspaceId])
   @@index([userId])
 
@@ -102,30 +102,30 @@ model WorkspaceMember {
 }
 
 model Board {
-  // Identity
+  // identity
   id String @id @default(uuid())
 
-  // Information
+  // info
   name        String
   description String?
 
   position Int @default(0)
 
-  // Foreign Keys
+  // foriegn
   workspaceId String
   createdById String
 
-  // Relations
+  // relation
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   createdBy User @relation("BoardCreator", fields: [createdById], references: [id])
 
   columns Column[]
 
-  // Audit
+  // autit
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Indexes
+  // indexes
   @@index([workspaceId])
   @@index([createdById])
 
@@ -133,22 +133,22 @@ model Board {
 }
 
 model Column {
-  // Identity
+  // identity
   id String @id @default(uuid())
 
-  // Information
+  // info
   name     String
   position Int @default(0)
 
-  // Foreign Key
+  // foreign
   boardId String
 
-  // Relations
+  // relation
   board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
 
   tasks Task[]
 
-  // Audit
+  // audit
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -159,10 +159,10 @@ model Column {
 }
 
 model Task {
-  // Identity
+  // identity
   id String @id @default(uuid())
 
-  // Information
+  // info
   title       String
   description String?
 
@@ -179,23 +179,23 @@ model Task {
   estimatedHours Int?
   actualHours    Int?
 
-  // Foreign Keys
+  // foreign
   columnId    String
   createdById String
   assigneeId  String?
 
-  // Relations
+  // relation
   column    Column @relation(fields: [columnId], references: [id], onDelete: Cascade)
 
   creator   User   @relation("TaskCreator", fields: [createdById], references: [id])
 
   assignee  User?  @relation("TaskAssignee", fields: [assigneeId], references: [id])
 
-  // Audit
+  // audit
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Indexes
+  // index
   @@index([columnId])
   @@index([createdById])
   @@index([assigneeId])
