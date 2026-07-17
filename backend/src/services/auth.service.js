@@ -44,21 +44,19 @@ export const register = async (data) => {
 
   const subject="verify user !!"
 
-  const html=verifyEmailTemplate(user.name,otp);
-
-  await sendMail(email,subject,html);
-
   const user = await createUser({
-      name,
-      username,
-      email,
-      password: hashedPassword,
-      isVerified: false,
-      emailVerificationToken: otp,
-      emailVerificationExpire: otpExpiry
-
-    });
+    name,
+    username,
+    email,
+    password: hashedPassword,
+    isVerified: false,
+    emailVerificationToken: otp,
+    emailVerificationExpire: otpExpiry
     
+  });
+  const html=verifyEmailTemplate(user.name,otp);
+  
+  await sendMail(email,subject,html);
     logger.info("user created in db !!")
 
   return {

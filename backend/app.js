@@ -1,5 +1,5 @@
 import express from "express";
-
+import cors from "cors"
 import errorHandler from "./src/middleware/errorHandler.js";
 import morganMiddleware from "./src/middleware/morgon.middleware.js";
 import cookieParser from "cookie-parser";
