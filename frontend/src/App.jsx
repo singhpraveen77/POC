@@ -1,63 +1,103 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { ThemeProvider } from './context/ThemeContext'
-import { AuthProvider } from './context/AuthContext'
-import { TaskProvider } from './context/TaskContext'
+import { useDispatch } from 'react-redux'
+import { checkAuth } from './redux/auth/authThunk'
 
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import RedirectIfAuth from './components/auth/RedirectIfAuth'
-import LoginPage from './components/auth/LoginPage'
-import SignupPage from './components/auth/SignupPage'
+// \import SignupPage from './components/auth/SignupPage'
 import Layout from './components/layout/Layout'
+import { Toaster } from 'react-hot-toast'
 
-import Dashboard from './pages/Dashboard'
-import Settings from './pages/Settings'
+import WorkspaceList from './pages/WorkspaceList'
+import BoardList from './pages/BoardList'
 import KanbanBoard from './components/kanban/KanbanBoard'
+import LoginPage from './pages/LoginPage'
+import SignupPage from './pages/SignupPage'
+import VerifyOtpPage from './pages/VerifyOtpPage'
+import VerifyEmailPage from './pages/VerifyEmailPage'
+import VerifyEmailCodePage from './pages/VerifyEmailCodePage'
 
 export default function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <TaskProvider>
-          <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true,
-            }}
-          >
-            <Routes>
-              {/* Public routes */}
-              <Route
-                path="/login"
-                element={
-                  <RedirectIfAuth>
-                    <LoginPage />
-                  </RedirectIfAuth>
-                }
-              />
-              <Route
-                path="/signup"
-                element={
-                  <RedirectIfAuth>
-                    <SignupPage />
-                  </RedirectIfAuth>
-                }
-              />
+    <>
+      <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
+        <Routes>
+          {/* Public routes */}
+          <Route
+            path="/login"
+            element={
+              <RedirectIfAuth>
+                <LoginPage />
+              </RedirectIfAuth>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <RedirectIfAuth>
+                <SignupPage />
+              </RedirectIfAuth>
+            }
+          />
+          <Route
+            path="/verify-otp"
+            element={
+              <RedirectIfAuth>
+                <VerifyEmailPage />
+              </RedirectIfAuth>
+            }
+          />
+          <Route
+            path="/verify-otp/code"
+            element={
+              <RedirectIfAuth>
+                <VerifyEmailCodePage />
+              </RedirectIfAuth>
+            }
+          />
+          <Route
+            path="/verify-email"
+            element={
+              <RedirectIfAuth>
+                <VerifyEmailPage />
+              </RedirectIfAuth>
+            }
+          />
+          <Route
+            path="/verify-email/code"
+            element={
+              <RedirectIfAuth>
+                <VerifyEmailCodePage />
+              </RedirectIfAuth>
+            }
+          />
 
-              {/* Protected routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route element={<Layout />}>
-                  <Route index element={<Dashboard />} />
-                  <Route path="/boards" element={<KanbanBoard />} />
-                  <Route path="/settings" element={<Settings />} />
-                </Route>
-              </Route>
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<Layout />}>
+              <Route index element={<WorkspaceList />} />
+              <Route path="/workspaces/:workspaceId" element={<BoardList />} />
+              <Route path="/boards/:boardId" element={<KanbanBoard />} />
+            </Route>
+          </Route>
 
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </BrowserRouter>
-        </TaskProvider>
-      </AuthProvider>
-    </ThemeProvider>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   )
 }

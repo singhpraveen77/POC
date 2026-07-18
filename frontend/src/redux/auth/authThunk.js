@@ -7,7 +7,8 @@ export const register = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.post("/auth/register", data);
-
+      console.log("register", res);
+      
       return {
         message: res.data.message,
         data: res.data.data,
@@ -34,6 +35,40 @@ export const verifyOtp = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "OTP verification failed"
+      );
+    }
+  }
+);
+
+export const sendVerificationCode = createAsyncThunk(
+  "auth/sendVerificationCode",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.post("/auth/send-verification-code", data);
+      return {
+        message: res.data.message,
+        data: res.data.data,
+      };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Sending verification code failed"
+      );
+    }
+  }
+);
+
+export const verifyEmail = createAsyncThunk(
+  "auth/verifyEmail",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.post("/auth/verify-email", data);
+      return {
+        message: res.data.message,
+        data: res.data.data,
+      };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Email verification failed"
       );
     }
   }
@@ -73,6 +108,32 @@ export const verifyUser = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message || "Verification failed"
       );
+    }
+  }
+);
+
+export const checkAuth = createAsyncThunk(
+  "auth/checkAuth",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get("/auth/me");
+      return {
+        user: res.data.data.user,
+      };
+    } catch (error) {
+      return rejectWithValue("Not authenticated");
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  "auth/logoutUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      await axiosInstance.post("/auth/logout");
+      return true;
+    } catch (error) {
+      return rejectWithValue("Logout failed");
     }
   }
 );

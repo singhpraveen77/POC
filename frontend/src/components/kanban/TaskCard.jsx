@@ -1,14 +1,5 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import Avatar from '../common/Avatar'
-import Badge from '../common/Badge'
-
-function priorityVariant(priority) {
-  if (priority === 'urgent') return 'urgent'
-  if (priority === 'high') return 'high'
-  if (priority === 'medium') return 'medium'
-  return 'low'
-}
 
 function formatDate(dateStr) {
   if (!dateStr) return null
@@ -30,28 +21,26 @@ export default function TaskCard({ task, isDone = false, onClick }) {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0 : 1,
-    touchAction: 'none',   // Critical: prevents browser scroll from swallowing touch events
-    userSelect: 'none',    // Prevents text selection interfering with drag on mobile
+    touchAction: 'none',
+    userSelect: 'none',
   }
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <div
         onClick={onClick}
-        className="group relative flex flex-col gap-2.5 p-3 rounded-lg border cursor-pointer transition-all duration-150 select-none"
+        className="group relative flex flex-col gap-2.5 p-3 border cursor-pointer transition-none select-none"
         style={{
           backgroundColor: 'var(--color-surface-container-lowest)',
           borderColor: 'var(--color-outline-variant)',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
           opacity: isDone ? 0.5 : 1,
+          boxShadow: '2px 2px 0px rgba(0,0,0,1)',
         }}
         onMouseEnter={e => {
           e.currentTarget.style.borderColor = 'var(--color-primary)'
-          e.currentTarget.style.boxShadow = '0 2px 8px rgba(33,112,228,0.15)'
         }}
         onMouseLeave={e => {
           e.currentTarget.style.borderColor = 'var(--color-outline-variant)'
-          e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'
         }}
       >
         {/* Edit button on hover */}
@@ -108,25 +97,6 @@ export default function TaskCard({ task, isDone = false, onClick }) {
           </div>
         )}
 
-        {/* Labels / Badges */}
-        {task.labels.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {task.labels.map(label => (
-              <Badge
-                key={label}
-                label={label}
-                variant={
-                  label.toLowerCase() === 'urgent' || task.priority === 'urgent'
-                    ? 'urgent'
-                    : label.toLowerCase() === 'high' || task.priority === 'high'
-                      ? 'high'
-                      : 'default'
-                }
-              />
-            ))}
-          </div>
-        )}
-
         {/* Footer */}
         <div
           className="flex items-center justify-between pt-2 border-t"
@@ -147,8 +117,16 @@ export default function TaskCard({ task, isDone = false, onClick }) {
             ) : null}
           </div>
 
-          {/* Assignee avatar */}
-          <Avatar name={task.assignee.name} src={task.assignee.avatar} size="sm" />
+          {/* Assignee initial */}
+          {task.assignee?.name && (
+            <div style={{ 
+              width: 20, height: 20, backgroundColor: 'var(--color-primary-container)', 
+              color: 'var(--color-on-primary-container)', display: 'flex', alignItems: 'center', 
+              justifyContent: 'center', fontWeight: 'bold', fontSize: 10 
+            }}>
+              {task.assignee.name.charAt(0).toUpperCase()}
+            </div>
+          )}
         </div>
       </div>
     </div>

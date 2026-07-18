@@ -8,9 +8,9 @@ import App from './App.jsx'
 
 import { Provider } from "react-redux";
 import { store } from './redux/store.js';
+import { setupAxiosInterceptors } from './axios/setupInterceptors';
 
-
-
+setupAxiosInterceptors(store);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

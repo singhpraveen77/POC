@@ -4,21 +4,33 @@ import { createPortal } from 'react-dom'
 export default function Modal({ isOpen, onClose, title, children, className = '' }) {
   const containerRef = useRef(null)
 
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
+
   // Focus trap + Escape close
   useEffect(() => {
     if (!isOpen) return
 
     const prev = document.activeElement
 
-    // Focus first focusable element
+    // Focus first focusable input/textarea element, or fallback to first focusable element
     const focusable = containerRef.current?.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     )
-    if (focusable?.length) focusable[0].focus()
+    if (focusable?.length) {
+      const inputs = Array.from(focusable).filter(el => el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT');
+      if (inputs.length > 0) {
+        inputs[0].focus();
+      } else {
+        focusable[0].focus();
+      }
+    }
 
     function handleKeyDown(e) {
       if (e.key === 'Escape') {
-        onClose()
+        onCloseRef.current()
         return
       }
       if (e.key !== 'Tab') return
@@ -48,7 +60,7 @@ export default function Modal({ isOpen, onClose, title, children, className = ''
       document.removeEventListener('keydown', handleKeyDown)
       prev?.focus()
     }
-  }, [isOpen, onClose])
+  }, [isOpen])
 
   if (!isOpen) return null
 

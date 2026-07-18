@@ -1,9 +1,12 @@
+import { TailSpin } from 'react-loader-spinner'
+
 export default function Button({
   variant = 'solid',
   size = 'md',
   icon,
   iconAfter,
   disabled = false,
+  loading = false,
   type = 'button',
   onClick,
   className = '',
@@ -14,22 +17,34 @@ export default function Button({
     .filter(Boolean)
     .join(' ')
 
+  const spinnerColor = variant === 'solid' || variant === 'danger' ? '#ffffff' : 'var(--color-primary)'
+
   return (
     <button
       type={type}
-      disabled={disabled}
+      disabled={disabled || loading}
       onClick={onClick}
       className={classes}
-      {...rest}
-    >
-      {icon && (
-        <span className="material-symbols-outlined">
-          {icon}
-        </span>
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "8px",
+        padding: "0 0.5rem",
+        cursor: disabled || loading ? "not-allowed" : "pointer",
+      }}      {...rest}
+          >
+      {loading ? (
+        <TailSpin height="16" width="16" color={spinnerColor} ariaLabel="loading" />
+      ) : (
+        icon && (
+          <span className="material-symbols-outlined" style={{ fontSize: size === 'sm' ? 16 : 20 }}>
+            {icon}
+          </span>
+        )
       )}
-      {children}
-      {iconAfter && (
-        <span className="material-symbols-outlined">
+      <span>{children}</span>
+      {!loading && iconAfter && (
+        <span className="material-symbols-outlined" style={{ fontSize: size === 'sm' ? 16 : 20 }}>
           {iconAfter}
         </span>
       )}

@@ -1,12 +1,7 @@
-import { useState } from 'react'
-import { useAuth } from '../../context/AuthContext'
-import { useTheme } from '../../context/ThemeContext'
-import Avatar from '../common/Avatar'
+import { useSelector } from 'react-redux'
 
 export default function Navbar({ onMenuToggle }) {
-  const { user } = useAuth()
-  const { theme, toggleTheme } = useTheme()
-  const [search, setSearch] = useState('')
+  const { user } = useSelector(state => state.auth)
 
   return (
     <header
@@ -48,51 +43,17 @@ export default function Navbar({ onMenuToggle }) {
       </div>
 
       {/* Right */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        {/* Search */}
-        <div
-          className="desktop-search"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            height: 36,
-            padding: '0 12px',
-            borderRadius: 20,
-            backgroundColor: 'var(--color-surface-container-low)',
-            border: '1px solid transparent',
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--color-outline)', flexShrink: 0 }}>
-            search
-          </span>
-          <input
-            type="text"
-            placeholder="Search tasks…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              outline: 'none',
-              width: 176,
-              fontSize: 14,
-              color: 'var(--color-on-surface)',
-              fontFamily: 'inherit',
-            }}
-          />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ 
+            width: 32, height: 32, borderRadius: '4px', backgroundColor: 'var(--color-primary-container)', 
+            color: 'var(--color-on-primary-container)', display: 'flex', alignItems: 'center', 
+            justifyContent: 'center', fontWeight: 'bold' 
+          }}>
+            {user?.name?.charAt(0).toUpperCase()}
+          </div>
+          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-on-surface)' }}>{user?.name}</span>
         </div>
-
-
-        {/* Theme toggle */}
-        <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle theme">
-          <span className="material-symbols-outlined">
-            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-          </span>
-        </button>
-
-        {/* Avatar */}
-        <Avatar src={user?.avatar} name={user?.name ?? ''} size="md" />
       </div>
     </header>
   )
