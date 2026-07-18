@@ -25,7 +25,7 @@ export const registerSchema = z.object({
     .regex(/[A-Z]/, "Must contain an uppercase letter")
     .regex(/[a-z]/, "Must contain a lowercase letter")
     .regex(/[0-9]/, "Must contain a number")
-    .regex(/[!@#$%^&*(),.?":{}|<>]/, "Must contain a special character"),
+    .regex(/[!@#$%^&*(),.?":{}\[\]|<>]/, "Must contain at least one special character")
 });
 
 export const loginSchema = z.object({
@@ -47,7 +47,7 @@ export const verifyOtpSchema = z.object({
 
   otp: z
     .string()
-    .length(4, "OTP must be 6 digits")
+    .length(4, "OTP must be 4 digits")
     .regex(/^\d+$/, "OTP must contain only numbers"),
 });
 
@@ -56,15 +56,22 @@ export const verifyUserSchema = z.object({
     .string()
     .trim()
     .email("Invalid email address"),
-
-  username: z
+});
+export const sendVerificationCodeSchema = z.object({
+  email: z
     .string()
     .trim()
-    .min(3, "Username must be at least 3 characters")
-    .max(20, "Username cannot exceed 20 characters")
-    .regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers and underscore are allowed"),
+    .email("Invalid email address"),
 });
 
+export const verifyEmailSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email("Invalid email address"),
 
-
-
+  otp: z
+    .string()
+    .length(6, "OTP must be 6 digits")
+    .regex(/^\d+$/, "OTP must contain only numbers"),
+});

@@ -24,8 +24,26 @@ export const register = async (data) => {
   const existingEmail = await findByEmail(email);
 
   if (existingEmail) {
-      throw new AppError("Email already registered", 409);
+    if (!existingEmail.isVerified) {
+      const otp = Math.floor(1000 + Math.random() * 9000).toString();
+      const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+      
+      logger.info("[AuthService] Existing unverified user found. Re-generating OTP.");
+      
+      const subject = "Verify your account - OTP Resend";
+      const html = verifyEmailTemplate(existingEmail.name, otp);
+      
+      await sendMail(email, subject, html);
+      
+      await updateUser(existingEmail.id, {
+        emailVerificationToken: otp,
+        emailVerificationExpire: otpExpiry,
+      });
+
+      throw new AppError("Email registered but not verified", 403);
     }
+    throw new AppError("Email already registered", 409);
+  }
     
     logger.info("unique user verified ")
   const existingUsername = await findByUsername(username);
@@ -54,10 +72,13 @@ export const register = async (data) => {
     emailVerificationExpire: otpExpiry
     
   });
-  const html=verifyEmailTemplate(user.name,otp);
-  
-  await sendMail(email,subject,html);
-    logger.info("user created in db !!")
+  try {
+    await sendMail(email,subject,html);
+    logger.info("user created in db !! email sent successfully.");
+  } catch (mailError) {
+    logger.error(`[AuthService] Failed to send registration email via Brevo: ${mailError.message}`);
+    logger.warn(`[DEVELOPMENT OTP BYPASS] Email delivery failed. For testing/verification, your OTP is: ${otp}`);
+  }
 
   return {
     id: user.id,
@@ -68,92 +89,108 @@ export const register = async (data) => {
   };
 };
 
-export const  verifyUser = async (data) => {
-  const {id,email,username}=data;
+export const verifyUser = async (data) => {
+  const { email } = data;
+  logger.info(`[AuthService] Resending OTP for email: ${email}`);
 
-  if(!id || !email || !username){
-    throw new AppError("missing fields",400);
+  if (!email) {
+    throw new AppError("Email is required", 400);
   }
 
-  let user= findByEmail(email);
+  let user = await findByEmail(email);
 
-  if(!user ){
-    throw new AppError("Invalid email ",401)
+  if (!user) {
+    logger.warn(`[AuthService] Resend OTP failed: User ${email} not found`);
+    throw new AppError("Invalid email", 401);
   }
 
-  const otp = Math.floor(1000+Math.random()*9000).toString();;
-  
+  const otp = Math.floor(1000 + Math.random() * 9000).toString();
   const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
   
-  logger.info("otp generated !!")
+  logger.info("[AuthService] New OTP generated");
 
-  const subject="verify user !!"
+  const subject = "Verify your account - OTP Resend";
+  const html = verifyEmailTemplate(user.name, otp);
 
-  const html=verifyEmailTemplate(user.name,otp);
+  try {
+    await sendMail(email, subject, html);
+    logger.info("[AuthService] Resent OTP email successfully");
+  } catch (mailError) {
+    logger.error(`[AuthService] Failed to send verification resend email via Brevo: ${mailError.message}`);
+    logger.warn(`[DEVELOPMENT OTP BYPASS] Email delivery failed. For testing/verification, your OTP is: ${otp}`);
+  }
 
-  await sendMail(email,subject,html);
-
-  user=await updateUser(id,
-    {
-      "emailVerificationToken": otp,
-      "emailVerificationExpire": otpExpiry
-    }
-  );
-
-  logger.info("otp mail sent !! ")
+  user = await updateUser(user.id, {
+    emailVerificationToken: otp,
+    emailVerificationExpire: otpExpiry
+  });
 
   return user;
-}
+};
 
 export const verifyOtp = async (data) => {
   const { email, otp } = data;
+  logger.info(`[AuthService] Verifying OTP for email: ${email}`);
 
   const user = await findByEmail(email);
 
   if (!user) {
+    logger.warn(`[AuthService] User with email ${email} not found during OTP verification`);
     throw new AppError("User not found", 404);
   }
 
   if (user.isVerified) {
+    logger.warn(`[AuthService] User ${email} is already verified`);
     throw new AppError("User already verified", 400);
   }
 
   if (new Date() > user.emailVerificationExpire) {
+    logger.warn(`[AuthService] OTP expired for user ${email}`);
     throw new AppError("OTP expired", 410);
   }
 
   if (user.emailVerificationToken !== otp) {
+    logger.warn(`[AuthService] Invalid OTP provided for user ${email}`);
     throw new AppError("Invalid OTP", 400);
   }
 
+  logger.info(`[AuthService] OTP successfully matched. Updating user status to verified.`);
   const updatedUser = await updateUser(user.id, {
     isVerified: true,
     emailVerificationToken: null,
     emailVerificationExpire: null,
   });
+  logger.info(`[AuthService] User ${email} verification complete`);
 
   return updatedUser;
 };
 
 export const login = async (data) => {
   const { email, password } = data;
+  logger.info(`[AuthService] Starting login process for email: ${email}`);
 
   const user = await findByEmail(email);
   
   if (!user) {
+    logger.warn(`[AuthService] Login failed: User ${email} not found`);
     throw new AppError("Invalid email or password", 401);
   }
 
+  logger.info(`[AuthService] User found. Checking verification status.`);
   if (!user.isVerified) {
+    logger.warn(`[AuthService] Login failed: User ${email} is not verified`);
     throw new AppError("Please verify your email first", 403);
   }
 
+  logger.info(`[AuthService] Verifying password matches`);
   const validPassword = await isMatch(password, user.password);
 
   if (!validPassword) {
+    logger.warn(`[AuthService] Login failed: Incorrect password for user ${email}`);
     throw new AppError("Invalid email or password", 401);
   }
 
+  logger.info(`[AuthService] Password verified successfully. Login successful.`);
   return {
     id: user.id,
     name: user.name,
@@ -161,5 +198,105 @@ export const login = async (data) => {
     email: user.email,
     isVerified: user.isVerified,
   };
+};
+
+export const bypass = async (data)=>{
+    const {password}=data;
+    if(!password){
+
+        throw new AppError("password not found in body", 400);
+    }
+
+
+    const hashedPassword = await hashPassword(password);
+
+  return {
+    hashedPassword
+  }
+
+}
+
+export const sendVerificationCode = async (data) => {
+  const { email } = data;
+  logger.info(`[AuthService] Beginning sendVerificationCode for email: ${email}`);
+
+  const user = await findByEmail(email);
+  if (!user) {
+    logger.warn(`[AuthService] Send verification code failed: User with email ${email} not found`);
+    throw new AppError("User not found", 404);
+  }
+
+  if (user.isVerified) {
+    logger.warn(`[AuthService] Send verification code failed: User ${email} is already verified`);
+    throw new AppError("User already verified", 400);
+  }
+
+  // Generate 6-digit secure OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedOtp = await hashPassword(otp);
+  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiration
+
+  logger.info(`[AuthService] Generated 6-digit OTP and hashed it successfully for user: ${email}`);
+
+  const subject = "Verify your account - OTP Code";
+  const html = verifyEmailTemplate(user.name, otp);
+
+  try {
+    await sendMail(email, subject, html);
+    logger.info(`[AuthService] Sent OTP email to: ${email}`);
+  } catch (mailError) {
+    logger.error(`[AuthService] Failed to send verification code email via Brevo: ${mailError.message}`);
+    logger.warn(`[DEVELOPMENT OTP BYPASS] Email delivery failed. For testing/verification, your OTP is: ${otp}`);
+  }
+
+  await updateUser(user.id, {
+    emailVerificationToken: hashedOtp,
+    emailVerificationExpire: otpExpiry,
+  });
+  logger.info(`[AuthService] Updated OTP token and expiry in database for user: ${email}`);
+
+  return { email };
+};
+
+export const verifyEmail = async (data) => {
+  const { email, otp } = data;
+  logger.info(`[AuthService] Beginning verifyEmail process for email: ${email}`);
+
+  const user = await findByEmail(email);
+  if (!user) {
+    logger.warn(`[AuthService] Verification failed: User with email ${email} not found`);
+    throw new AppError("User not found", 404);
+  }
+
+  if (user.isVerified) {
+    logger.warn(`[AuthService] Verification failed: User ${email} is already verified`);
+    throw new AppError("User already verified", 400);
+  }
+
+  if (!user.emailVerificationToken || !user.emailVerificationExpire) {
+    logger.warn(`[AuthService] Verification failed: No OTP token or expiry found for user ${email}`);
+    throw new AppError("Invalid verification request", 400);
+  }
+
+  if (new Date() > user.emailVerificationExpire) {
+    logger.warn(`[AuthService] Verification failed: OTP expired for user ${email}`);
+    throw new AppError("OTP expired", 410);
+  }
+
+  const match = await isMatch(otp, user.emailVerificationToken);
+  if (!match) {
+    logger.warn(`[AuthService] Verification failed: Invalid OTP provided for user ${email}`);
+    throw new AppError("Invalid OTP", 400);
+  }
+
+  logger.info(`[AuthService] OTP code successfully validated. Marking user ${email} as verified.`);
+  const updatedUser = await updateUser(user.id, {
+    isVerified: true,
+    emailVerificationToken: null,
+    emailVerificationExpire: null,
+  });
+
+  logger.info(`[AuthService] Email verification successful for user: ${email}`);
+  return updatedUser;
 };
 

@@ -88,3 +88,65 @@ export const loginController = async (req, res, next) => {
     next(error);
   }
 };
+
+export const logoutController = async (req, res, next) => {
+  try {
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+    return res.status(200).json(new ApiResponse(200, null, "Logout successful"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMeController = async (req, res, next) => {
+  try {
+    const user = req.user;
+    return res.status(200).json(new ApiResponse(200, { user }, "User retrieved successfully"));
+  } catch (error) {
+    next(error);
+  }
+};
+export const bypassController = async (req, res, next) => {
+  try {
+    
+    const {hashedPassword}=await authService.bypass(req.body)
+
+    return res.status(200).json(new ApiResponse(200,  {hashedPassword} , "password retrieved successfully"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const sendVerificationCodeController = async (req, res, next) => {
+  try {
+    const result = await authService.sendVerificationCode(req.body);
+    return res.status(200).json(new ApiResponse(200, result, "Verification code sent successfully."));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyEmailController = async (req, res, next) => {
+  try {
+    const user = await authService.verifyEmail(req.body);
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          id: user.id,
+          name: user.name,
+          username: user.username,
+          email: user.email,
+          isVerified: user.isVerified,
+        },
+        "Email verified successfully."
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
+};
