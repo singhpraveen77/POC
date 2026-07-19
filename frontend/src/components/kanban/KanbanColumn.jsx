@@ -75,16 +75,13 @@ export default function KanbanColumn({ columnId, title, tasks, onCardClick, acti
         style={{
           borderBottomStyle: isDone ? 'dashed' : 'solid',
           borderColor: 'var(--color-outline-variant)',
-          borderTopLeftRadius: '8px',
-          borderTopRightRadius: '8px',
+          borderTopLeftRadius: '0px',
+          borderTopRightRadius: '0px',
           backgroundColor: isDone ? 'var(--color-surface-container-lowest)' : 'var(--color-surface-container-low)',
         }}
       >
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <div
-            className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${isInProgress ? 'animate-pulse' : ''}`}
-            style={{ backgroundColor: dotColor }}
-          />
+          
           
           {isEditing ? (
             <input
@@ -121,7 +118,7 @@ export default function KanbanColumn({ columnId, title, tasks, onCardClick, acti
           )}
 
           <span
-            className="text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+            className="text-[11px] font-bold px-2 py-0.5 "
             style={{
               backgroundColor: isInProgress ? 'var(--color-primary-container)' : 'var(--color-surface-container-high)',
               color: isInProgress ? 'var(--color-on-primary-container)' : 'var(--color-on-surface-variant)',

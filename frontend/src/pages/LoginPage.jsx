@@ -105,15 +105,7 @@ export default function LoginPage() {
             marginBottom: "28px",
           }}
         >
-          <div style={{
-            width: 48, height: 48, borderRadius: 8,
-            backgroundColor: 'var(--color-primary)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px auto',
-            boxShadow: '0 2px 8px rgba(234, 88, 12, 0.25)',
-          }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 24, color: '#fff' }}>view_kanban</span>
-          </div>
+          
           <h2
             style={{
               margin: 0,
@@ -148,7 +140,7 @@ export default function LoginPage() {
             id="email"
             label="Email Address"
             type="email"
-            placeholder="name@example.com"
+            placeholder="praveen@example.com"
             value={email}
             autoFocus
             error={errors.email}

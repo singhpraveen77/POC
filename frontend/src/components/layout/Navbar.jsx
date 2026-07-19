@@ -46,7 +46,7 @@ export default function Navbar({ onMenuToggle }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ 
-            width: 32, height: 32, borderRadius: '4px', backgroundColor: 'var(--color-primary-container)', 
+            width: 32, height: 32, borderRadius: '4px', backgroundColor: 'lightgrey', 
             color: 'var(--color-on-primary-container)', display: 'flex', alignItems: 'center', 
             justifyContent: 'center', fontWeight: 'bold' 
           }}>

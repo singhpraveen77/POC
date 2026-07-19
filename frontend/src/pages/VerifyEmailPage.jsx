@@ -81,15 +81,7 @@ export default function VerifyEmailPage() {
         }}
       >
         <div style={{ marginBottom: "24px", textAlign: "center" }}>
-          <div style={{
-            width: 48, height: 48, borderRadius: 8,
-            backgroundColor: 'var(--color-primary)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px auto',
-            boxShadow: '0 2px 8px rgba(234, 88, 12, 0.25)',
-          }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 24, color: '#fff' }}>mail</span>
-          </div>
+          
           <h2
             style={{
               fontSize: "26px",

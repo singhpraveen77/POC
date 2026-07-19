@@ -112,19 +112,11 @@ export default function Sidebar({ isOpen, onClose }) {
     }}>
       {/* Brand Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 8px', marginBottom: 28 }}>
-        <div style={{
-          width: 36, height: 36, borderRadius: 6, flexShrink: 0,
-          backgroundColor: 'var(--color-primary)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(234, 88, 12, 0.25)',
-        }}>
-          <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#fff' }}>view_kanban</span>
-        </div>
+        
         <div>
           <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-on-surface)', lineHeight: 1.1, margin: 0 }}>
             Kanban Project
           </p>
-          <span style={{ fontSize: 11, color: 'var(--color-on-surface-variant)', fontWeight: 500 }}>Workspace Manager</span>
         </div>
       </div>
 
@@ -142,7 +134,7 @@ export default function Sidebar({ isOpen, onClose }) {
               gap: 10,
               padding: '10px 12px',
               borderRadius: 6,
-              backgroundColor: isActive ? 'var(--color-primary-container)' : 'transparent',
+              // backgroundColor: isActive ? '' : 'transparent',
               color: isActive ? 'var(--color-primary)' : 'var(--color-on-surface-variant)',
               fontSize: 14,
               fontWeight: isActive ? 600 : 500,
@@ -150,8 +142,7 @@ export default function Sidebar({ isOpen, onClose }) {
               transition: 'all 0.2s',
             })}
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>grid_view</span>
-            Dashboard / Workspaces
+            Dashboard
           </NavLink>
         </div>
 
@@ -234,7 +225,6 @@ export default function Sidebar({ isOpen, onClose }) {
                         maxWidth: '120px'
                       })}
                     >
-                      <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--color-primary)' }}>folder</span>
                       {ws.name}
                     </NavLink>
 
