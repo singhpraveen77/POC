@@ -26,20 +26,17 @@ export default function KanbanBoard() {
   
   const [activeId, setActiveId] = useState(null)
   
-  // Column creation modal
   const [isColumnModalOpen, setIsColumnModalOpen] = useState(false)
   const [columnName, setColumnName] = useState("")
   const [columnErrors, setColumnErrors] = useState({})
   const [isSubmittingColumn, setIsSubmittingColumn] = useState(false)
 
-  // Task creation modal
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false)
   const [taskTitle, setTaskTitle] = useState("")
   const [taskColumnId, setTaskColumnId] = useState(null)
   const [taskErrors, setTaskErrors] = useState({})
   const [isSubmittingTask, setIsSubmittingTask] = useState(false)
 
-  // Task edit/detail modal
   const [editingTask, setEditingTask] = useState(null)
   const [editTaskTitle, setEditTaskTitle] = useState("")
   const [editTaskDescription, setEditTaskDescription] = useState("")
@@ -65,7 +62,6 @@ export default function KanbanBoard() {
     setActiveId(null)
     if (!over) return
 
-    // Find task
     let activeTask = null;
     let fromColumnId = null;
     currentBoard?.columns.forEach(c => {
@@ -78,7 +74,6 @@ export default function KanbanBoard() {
 
     if (!activeTask) return;
 
-    // Determine destination column
     let toColumnId = over.id;
     const isOverTask = !currentBoard?.columns.find(c => c.id === over.id);
     if (isOverTask) {
@@ -91,9 +86,7 @@ export default function KanbanBoard() {
 
     if (!toColumnId) return;
 
-    // Only update if it actually moved to a different column
     if (fromColumnId !== toColumnId) {
-      // Optimistic update
       dispatch(moveTaskOptimistically({ taskId: activeTask.id, fromColumnId, toColumnId }));
 
       dispatch(updateTask({
@@ -167,7 +160,6 @@ export default function KanbanBoard() {
     setEditTaskErrors({})
     setIsSubmittingEditTask(true)
 
-    // Find destination column ID based on status
     const targetStatus = editTaskStatus.toLowerCase().replace('_', '-');
     const targetColumn = currentBoard?.columns?.find(c => {
       const colName = c.name.toLowerCase().replace('_', '-');

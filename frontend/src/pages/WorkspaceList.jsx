@@ -6,36 +6,21 @@ import Button from "../components/common/Button";
 import Modal from "../components/common/Modal";
 import { extractFieldErrors, getErrorMessage } from "../utils/errorHelper";
 import toast from "react-hot-toast";
+import { WorkspaceSkeleton } from "../components/loader/WorkspaceLoader";
 
-const WorkspaceSkeleton = () => (
-  <div className="animate-pulse" style={{
-    padding: 24,
-    backgroundColor: "var(--color-surface-container-low)",
-    border: "1px solid var(--color-outline-variant)",
-    borderRadius: "8px",
-    height: "108px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px"
-  }}>
-    <div style={{ height: 18, backgroundColor: "var(--color-surface-container-high)", borderRadius: 4, width: "60%" }}></div>
-    <div style={{ height: 14, backgroundColor: "var(--color-surface-container-high)", borderRadius: 4, width: "40%" }}></div>
-  </div>
-);
+
 
 export default function WorkspaceList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items, status } = useSelector((state) => state.workspaces);
   
-  // Create state
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [createErrors, setCreateErrors] = useState({});
   const [isSubmittingCreate, setIsSubmittingCreate] = useState(false);
 
-  // Edit state
   const [editingWorkspace, setEditingWorkspace] = useState(null);
   const [editName, setEditName] = useState("");
   const [editSlug, setEditSlug] = useState("");

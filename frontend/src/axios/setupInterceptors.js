@@ -15,8 +15,7 @@ export const setupAxiosInterceptors = (store) => {
         } else if (error.response.status >= 500) {
           toast.error('Server error. Please try again later.');
         } else if (error.response.status === 400 || error.response.status === 403 || error.response.status === 409) {
-          // If it is a Zod validation error or custom business error, we can toast it if not handled by form,
-          // or just toast it generally if it's not a field validation error.
+
           toast.error(error.response.data.message || 'Invalid request.');
         }
       } else if (error.request) {

@@ -16,14 +16,12 @@ export default function Sidebar({ isOpen, onClose }) {
 
   const [expandedWorkspaces, setExpandedWorkspaces] = useState({})
 
-  // Create workspace modal state
   const [isCreateWorkspaceOpen, setIsCreateWorkspaceOpen] = useState(false)
   const [wsName, setWsName] = useState("")
   const [wsSlug, setWsSlug] = useState("")
   const [wsErrors, setWsErrors] = useState({})
   const [isSubmittingWs, setIsSubmittingWs] = useState(false)
 
-  // Create board modal state
   const [boardWorkspaceId, setBoardWorkspaceId] = useState(null)
   const [boardName, setBoardName] = useState("")
   const [boardDesc, setBoardDesc] = useState("")
@@ -62,7 +60,6 @@ export default function Sidebar({ isOpen, onClose }) {
         setIsCreateWorkspaceOpen(false)
         setWsName("")
         setWsSlug("")
-        // Auto-expand newly created workspace
         setExpandedWorkspaces(prev => ({ ...prev, [newWs.id]: true }))
         navigate(`/workspaces/${newWs.id}`)
         onClose()
@@ -134,7 +131,6 @@ export default function Sidebar({ isOpen, onClose }) {
               gap: 10,
               padding: '10px 12px',
               borderRadius: 6,
-              // backgroundColor: isActive ? '' : 'transparent',
               color: isActive ? 'var(--color-primary)' : 'var(--color-on-surface-variant)',
               fontSize: 14,
               fontWeight: isActive ? 600 : 500,
@@ -146,7 +142,6 @@ export default function Sidebar({ isOpen, onClose }) {
           </NavLink>
         </div>
 
-        {/* Expandable Workspace Tree */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 12px 8px 12px', borderBottom: '1px solid var(--color-outline-variant)', marginBottom: 8 }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-on-surface-variant)', uppercase: 'true', letterSpacing: '0.05em' }}>MY WORKSPACES</span>

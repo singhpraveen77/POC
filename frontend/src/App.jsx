@@ -35,7 +35,6 @@ export default function App() {
         }}
       >
         <Routes>
-          {/* Public routes */}
           <Route
             path="/login"
             element={
@@ -85,7 +84,6 @@ export default function App() {
             }
           />
 
-          {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
               <Route index element={<WorkspaceList />} />
@@ -94,7 +92,6 @@ export default function App() {
             </Route>
           </Route>
 
-          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

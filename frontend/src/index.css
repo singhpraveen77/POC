@@ -3,6 +3,9 @@
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
+  --font-display: 'Plus Jakarta Sans', sans-serif; /* For big headers */
+  --font-mono: 'JetBrains Mono', monospace;         /* For code snippets */
+
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;

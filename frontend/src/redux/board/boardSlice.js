@@ -74,11 +74,9 @@ const boardSlice = createSlice({
     moveTaskOptimistically: (state, action) => {
       const { taskId, fromColumnId, toColumnId } = action.payload;
       if (state.currentBoard && state.currentBoard.columns) {
-        // Backup current columns
         state.lastColumnsBackup = JSON.parse(JSON.stringify(state.currentBoard.columns));
         
         let foundTask = null;
-        // Remove task from original column
         state.currentBoard.columns = state.currentBoard.columns.map(col => {
           if (col.id === fromColumnId) {
             foundTask = col.tasks.find(t => t.id === taskId);
@@ -90,7 +88,6 @@ const boardSlice = createSlice({
           return col;
         });
 
-        // Add task to destination column
         if (foundTask) {
           foundTask.columnId = toColumnId;
           state.currentBoard.columns = state.currentBoard.columns.map(col => {
@@ -155,7 +152,6 @@ const boardSlice = createSlice({
           if (!state.currentBoard.columns) {
             state.currentBoard.columns = [];
           }
-          // Ensure tasks array is initialized
           const newCol = { ...action.payload, tasks: action.payload.tasks || [] };
           state.currentBoard.columns.push(newCol);
         }
@@ -164,7 +160,6 @@ const boardSlice = createSlice({
         if (state.currentBoard && state.currentBoard.columns) {
           const index = state.currentBoard.columns.findIndex(c => c.id === action.payload.id);
           if (index !== -1) {
-            // Retain existing tasks
             const existingTasks = state.currentBoard.columns[index].tasks || [];
             state.currentBoard.columns[index] = { 
               ...state.currentBoard.columns[index], 
@@ -191,13 +186,11 @@ const boardSlice = createSlice({
       })
       .addCase(updateTask.fulfilled, (state, action) => {
         if (state.currentBoard && state.currentBoard.columns) {
-          // Remove task from all columns first (in case of move)
           state.currentBoard.columns.forEach(c => {
             if (c.tasks) {
               c.tasks = c.tasks.filter(t => t.id !== action.payload.id);
             }
           });
-          // Add to target column
           const col = state.currentBoard.columns.find(c => c.id === action.payload.columnId);
           if (col) {
             if (!col.tasks) col.tasks = [];

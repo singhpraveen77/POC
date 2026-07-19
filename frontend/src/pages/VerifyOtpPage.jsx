@@ -12,8 +12,6 @@ export default function VerifyOtpPage() {
   const location = useLocation();
 
   const { loading, error, message } = useSelector((state) => state.auth);
-
-  // Retrieve email from signup page navigation state or fall back
   const signupEmail = location.state?.email || "";
   const [email, setEmail] = useState(signupEmail);
   const [otp, setOtp] = useState("");

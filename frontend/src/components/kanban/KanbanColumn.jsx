@@ -26,7 +26,6 @@ export default function KanbanColumn({ columnId, title, tasks, onCardClick, acti
   const [editName, setEditName] = useState(title)
   const menuRef = useRef(null)
 
-  // Handle click outside to close dropdown menu
   useEffect(() => {
     function clickOutside(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {

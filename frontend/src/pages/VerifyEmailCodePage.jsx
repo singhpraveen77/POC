@@ -12,13 +12,21 @@ export default function VerifyEmailCodePage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // useLocation() is a hook from React Router that gives you information about the current URL/location of your application.
+  // {
+//   pathname: "/dashboard/workspace/123",
+//   search: "?page=2",
+//   hash: "#section1",
+//   state: null,
+//   key: "abc123"
+// }
   const { loading, error } = useSelector((state) => state.auth);
   
   const email = location.state?.email || "";
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [otpError, setOtpError] = useState("");
   
-  // 60-second cooldown for Resend Code
+  // 60 sec cooldown
   const [cooldown, setCooldown] = useState(0);
   const inputRefs = [
     useRef(null),
@@ -63,7 +71,6 @@ export default function VerifyEmailCodePage() {
     setOtpError("");
     dispatch(clearError());
 
-    // Focus next input
     if (value && index < 5) {
       inputRefs[index + 1].current.focus();
     }

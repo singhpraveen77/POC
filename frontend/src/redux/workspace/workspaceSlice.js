@@ -87,7 +87,7 @@ const workspaceSlice = createSlice({
         const ws = state.items.find(w => w.id === action.payload.workspaceId);
         if (ws) {
           if (!ws.boards) ws.boards = [];
-          // Avoid duplicate boards
+          // Avoid duplicate 
           if (!ws.boards.some(b => b.id === action.payload.id)) {
             ws.boards.push(action.payload);
           }

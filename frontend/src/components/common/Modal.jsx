@@ -9,13 +9,11 @@ export default function Modal({ isOpen, onClose, title, children, className = ''
     onCloseRef.current = onClose
   }, [onClose])
 
-  // Focus trap + Escape close
   useEffect(() => {
     if (!isOpen) return
 
     const prev = document.activeElement
 
-    // Focus first focusable input/textarea element, or fallback to first focusable element
     const focusable = containerRef.current?.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     )
