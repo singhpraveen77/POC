@@ -9,7 +9,6 @@ import { Prisma } from "@prisma/client";
     url: req.originalUrl,
   });
 
-
   let statusCode = err.statusCode || 500;
   let message = err.message || "Internal Server Error";
   let errors = err.errors || null;

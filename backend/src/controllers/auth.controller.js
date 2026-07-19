@@ -39,6 +39,7 @@ export const verifyUserController = async (req, res, next) => {
     next(error);
   }
 };
+
 export const verifyOtpController = async (req, res, next) => {
   try {
     const user = await authService.verifyOtp(req.body);

@@ -57,6 +57,7 @@ export const verifyUserSchema = z.object({
     .trim()
     .email("Invalid email address"),
 });
+
 export const sendVerificationCodeSchema = z.object({
   email: z
     .string()

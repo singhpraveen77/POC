@@ -31,7 +31,7 @@ export const register = async (data) => {
       logger.info("[AuthService] Existing unverified user found. Re-generating OTP.");
       
       const subject = "Verify your account - OTP Resend";
-      const html = verifyEmailTemplate(existingEmail.name, otp);
+      const html = await verifyEmailTemplate(existingEmail.name, otp);
       
       await sendMail(email, subject, html);
       

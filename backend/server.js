@@ -1,8 +1,10 @@
 import app from "./app.js";
 import { connectDB } from "./config/db.js";
-import { env } from "./config/env.js";
+import dotenv from "dotenv";
 import logger from "./config/logger.js";
 import prisma from "./config/prisma.js";
+
+dotenv.config();
 
 process.on("uncaughtException", (err) => {
   logger.error("UNCAUGHT EXCEPTION! 💥");
@@ -15,8 +17,8 @@ const startServer = async () => {
     
     await connectDB();
 
-    const server = app.listen(env.PORT, () => {
-      logger.info(`🚀 Server running on port ${env.PORT}`);
+    const server = app.listen(process.env.PORT, () => {
+      logger.info(`🚀 Server running on port ${process.env.PORT}`);
     });
 
     process.on("unhandledRejection", (err) => {
