@@ -2,8 +2,6 @@
 
 A premium, state-of-the-art Kanban task management application built with **React**, **Vite**, and **Tailwind CSS**. Designed for teams who value speed, aesthetics, and a seamless mobile-first experience.
 
-![Kanban Project Preview](https://kan-ban-boarrd.netlify.app/)
-
 ## ✨ Key Features
 
 - **🚀 Advanced Drag-and-Drop**: Built on top of `@dnd-kit/core`, providing ultra-smooth, hardware-accelerated card sorting across columns.
