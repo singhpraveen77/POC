@@ -1,7 +1,6 @@
 import { findById } from "../repositories/user.repo.js";
 import AppError from "../utils/AppError.js";
 import { verifyAccessToken } from "../utils/jwt.js";
-// import { findById } from "../repositories/user.repository.js";
 
 export const authenticate = async (req, res, next) => {
   let token;
