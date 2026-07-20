@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const BASE_URL = import.meta.env.VITE_prod_BASE_URL;
+console.log("basr url ",BASE_URL)
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: BASE_URL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
