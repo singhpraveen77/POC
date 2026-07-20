@@ -18,6 +18,7 @@ import TaskCard from './TaskCard'
 import Button from '../common/Button'
 import Modal from '../common/Modal'
 import { extractFieldErrors } from '../../utils/errorHelper'
+import TaskOptionsLoader from '../loader/TaskOptionsLoader'
 
 export default function KanbanBoard() {
   const { boardId } = useParams()
@@ -42,7 +43,9 @@ export default function KanbanBoard() {
   const [editTaskDescription, setEditTaskDescription] = useState("")
   const [editTaskStatus, setEditTaskStatus] = useState("")
   const [editTaskErrors, setEditTaskErrors] = useState({})
-  const [isSubmittingEditTask, setIsSubmittingEditTask] = useState(false)
+  const [isSavingEditTask, setIsSavingEditTask] = useState(false)
+  const [isDeletingTask, setIsDeletingTask] = useState(false)
+  const isTaskOptionsLoading = isSavingEditTask || isDeletingTask
 
   useEffect(() => {
     dispatch(fetchBoardDetails(boardId))
@@ -158,7 +161,8 @@ export default function KanbanBoard() {
   const handleUpdateTask = (e) => {
     e.preventDefault()
     setEditTaskErrors({})
-    setIsSubmittingEditTask(true)
+    setIsSavingEditTask(true)
+    setIsDeletingTask(false)
 
     const targetStatus = editTaskStatus.toLowerCase().replace('_', '-');
     const targetColumn = currentBoard?.columns?.find(c => {
@@ -185,22 +189,22 @@ export default function KanbanBoard() {
         setEditTaskErrors(fields)
       })
       .finally(() => {
-        setIsSubmittingEditTask(false)
+        setIsSavingEditTask(false)
       })
   }
 
   const handleDeleteTask = () => {
-    if (window.confirm(`Are you sure you want to delete the task "${editingTask.title}"?`)) {
-      setIsSubmittingEditTask(true)
+      setIsDeletingTask(true)
+      setIsSavingEditTask(false)
       dispatch(deleteTask(editingTask.id))
         .unwrap()
         .then(() => {
           setEditingTask(null)
         })
         .finally(() => {
-          setIsSubmittingEditTask(false)
+          setIsDeletingTask(false)
         })
-    }
+    
   }
 
   const activeTask = activeId ? currentBoard?.columns?.flatMap(c => c.tasks || []).find(t => t.id === activeId) : null
@@ -334,81 +338,85 @@ export default function KanbanBoard() {
 
       {/* Task Edit / Detail Modal */}
       <Modal isOpen={!!editingTask} onClose={() => setEditingTask(null)} title="Task Card Options">
-        <form onSubmit={handleUpdateTask} style={{ padding: 24, display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Title *</label>
-            <input 
-              required 
-              placeholder="Task Title" 
-              value={editTaskTitle} 
-              onChange={e => setEditTaskTitle(e.target.value)} 
-              style={{
-                padding: "10px 12px",
-                border: "1px solid var(--color-outline)",
-                borderRadius: 6,
-                fontSize: 14,
-                outline: "none"
-              }}
-              className="focus:border-orange-500"
-            />
-            {editTaskErrors.title && (
-              <span style={{ fontSize: 12, color: "var(--color-error)", fontWeight: 500 }}>{editTaskErrors.title}</span>
-            )}
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Description</label>
-            <textarea 
-              placeholder="Task details and description..." 
-              value={editTaskDescription} 
-              onChange={e => setEditTaskDescription(e.target.value)}
-              rows={4}
-              style={{
-                padding: "10px 12px",
-                border: "1px solid var(--color-outline)",
-                borderRadius: 6,
-                fontSize: 14,
-                outline: "none",
-                resize: "vertical"
-              }}
-              className="focus:border-orange-500"
-            />
-            {editTaskErrors.description && (
-              <span style={{ fontSize: 12, color: "var(--color-error)", fontWeight: 500 }}>{editTaskErrors.description}</span>
-            )}
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Task Segment / Column</label>
-            <select
-              value={editTaskStatus}
-              onChange={e => setEditTaskStatus(e.target.value)}
-              style={{
-                padding: "10px 12px",
-                border: "1px solid var(--color-outline)",
-                borderRadius: 6,
-                fontSize: 14,
-                outline: "none",
-                backgroundColor: "var(--color-surface)"
-              }}
-              className="focus:border-orange-500"
-            >
-              {currentBoard.columns?.map(col => (
-                <option key={col.id} value={col.id}>{col.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginTop: 12 }}>
-            <Button variant="danger" onClick={handleDeleteTask} type="button" loading={isSubmittingEditTask} icon="delete">
-              Delete Task
-            </Button>
-            <div style={{ display: "flex", gap: 12 }}>
-              <Button variant="outline" onClick={() => setEditingTask(null)} type="button">Cancel</Button>
-              <Button variant="solid" type="submit" loading={isSubmittingEditTask}>Save Changes</Button>
+        {isTaskOptionsLoading ? (
+          <TaskOptionsLoader/>
+        ) : (
+          <form onSubmit={handleUpdateTask} style={{ padding: 24, display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Title *</label>
+              <input 
+                required 
+                placeholder="Task Title" 
+                value={editTaskTitle} 
+                onChange={e => setEditTaskTitle(e.target.value)} 
+                style={{
+                  padding: "10px 12px",
+                  border: "1px solid var(--color-outline)",
+                  borderRadius: 6,
+                  fontSize: 14,
+                  outline: "none"
+                }}
+                className="focus:border-orange-500"
+              />
+              {editTaskErrors.title && (
+                <span style={{ fontSize: 12, color: "var(--color-error)", fontWeight: 500 }}>{editTaskErrors.title}</span>
+              )}
             </div>
-          </div>
-        </form>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Description</label>
+              <textarea 
+                placeholder="Task details and description..." 
+                value={editTaskDescription} 
+                onChange={e => setEditTaskDescription(e.target.value)}
+                rows={4}
+                style={{
+                  padding: "10px 12px",
+                  border: "1px solid var(--color-outline)",
+                  borderRadius: 6,
+                  fontSize: 14,
+                  outline: "none",
+                  resize: "vertical"
+                }}
+                className="focus:border-orange-500"
+              />
+              {editTaskErrors.description && (
+                <span style={{ fontSize: 12, color: "var(--color-error)", fontWeight: 500 }}>{editTaskErrors.description}</span>
+              )}
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Task Segment / Column</label>
+              <select
+                value={editTaskStatus}
+                onChange={e => setEditTaskStatus(e.target.value)}
+                style={{
+                  padding: "10px 12px",
+                  border: "1px solid var(--color-outline)",
+                  borderRadius: 6,
+                  fontSize: 14,
+                  outline: "none",
+                  backgroundColor: "var(--color-surface)"
+                }}
+                className="focus:border-orange-500"
+              >
+                {currentBoard.columns?.map(col => (
+                  <option key={col.id} value={col.id}>{col.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginTop: 12 }}>
+              <Button variant="danger" onClick={handleDeleteTask} type="button" loading={isDeletingTask} icon="delete" disabled={isTaskOptionsLoading}>
+                Delete Task
+              </Button>
+              <div style={{ display: "flex", gap: 12 }}>
+                <Button variant="outline" onClick={() => setEditingTask(null)} type="button" disabled={isTaskOptionsLoading}>Cancel</Button>
+                <Button variant="solid" type="submit" loading={isSavingEditTask} disabled={isTaskOptionsLoading}>Save Changes</Button>
+              </div>
+            </div>
+          </form>
+        )}
       </Modal>
     </div>
   )

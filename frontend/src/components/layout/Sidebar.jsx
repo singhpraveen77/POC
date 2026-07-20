@@ -261,10 +261,12 @@ export default function Sidebar({ isOpen, onClose }) {
                               style={({ isActive }) => ({
                                 display: 'flex',
                                 alignItems: 'center',
+                                // justifyContent:'center',
+                                textAlign:'center',
                                 gap: 8,
                                 padding: '8px 10px',
                                 borderRadius: 4,
-                                backgroundColor: isActive ? 'var(--color-secondary-container)' : 'transparent',
+                                backgroundColor: isActive ? "bg-slate-200" : "transparent",
                                 color: isActive ? 'var(--color-secondary)' : 'var(--color-on-surface-variant)',
                                 fontSize: 12.5,
                                 fontWeight: isActive ? 600 : 500,
@@ -272,7 +274,8 @@ export default function Sidebar({ isOpen, onClose }) {
                                 transition: 'all 0.15s',
                               })}
                             >
-                              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>view_week</span>
+                              <span className="material-symbols-outlined" style={{ fontSize: 16,paddingBottom:'3%' }}>  ●
+</span>
                               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {board.name}
                               </span>

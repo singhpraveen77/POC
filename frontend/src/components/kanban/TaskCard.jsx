@@ -34,7 +34,8 @@ export default function TaskCard({ task, isDone = false, onClick }) {
           backgroundColor: 'var(--color-surface-container-lowest)',
           borderColor: 'var(--color-outline-variant)',
           opacity: isDone ? 0.5 : 1,
-          boxShadow: '2px 2px 0px rgba(0,0,0,1)',
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)" ,
+          borderRadius:"10px"       
         }}
         onMouseEnter={e => {
           e.currentTarget.style.borderColor = 'var(--color-primary)'

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { TailSpin } from 'react-loader-spinner'
 import TaskCard from './TaskCard'
 import { deleteColumn, updateColumn } from '../../redux/column/columnSlice'
 
@@ -24,6 +25,8 @@ export default function KanbanColumn({ columnId, title, tasks, onCardClick, acti
   const [menuOpen, setMenuOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState(title)
+  const [isRenaming, setIsRenaming] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const menuRef = useRef(null)
 
   useEffect(() => {
@@ -39,20 +42,35 @@ export default function KanbanColumn({ columnId, title, tasks, onCardClick, acti
   }, [menuOpen])
 
   const handleRenameSubmit = () => {
-    if (editName.trim() && editName.trim() !== title) {
-      dispatch(updateColumn({ id: columnId, data: { name: editName.trim() } }))
+    const trimmedName = editName.trim()
+    if (trimmedName && trimmedName !== title) {
+      setIsRenaming(true)
+      dispatch(updateColumn({ id: columnId, data: { name: trimmedName } }))
+        .unwrap()
+        .catch(() => {})
+        .finally(() => {
+          setIsRenaming(false)
+          setIsEditing(false)
+        })
+      return
     }
     setIsEditing(false)
   }
 
   const handleDelete = () => {
-    if (window.confirm(`Are you sure you want to delete the column "${title}"?`)) {
+      setIsDeleting(true)
       dispatch(deleteColumn(columnId))
-      setMenuOpen(false)
-    }
+        .unwrap()
+        .catch(() => {})
+        .finally(() => {
+          setIsDeleting(false)
+          setMenuOpen(false)
+        })
+    
   }
 
   const dotColor = COLUMN_DOT_COLORS[titleLower] || 'var(--color-outline)'
+  const isProcessing = isRenaming || isDeleting
 
   return (
     <div
@@ -83,28 +101,35 @@ export default function KanbanColumn({ columnId, title, tasks, onCardClick, acti
           
           
           {isEditing ? (
-            <input
-              type="text"
-              value={editName}
-              onChange={(e) => setEditName(e.target.value)}
-              onBlur={handleRenameSubmit}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleRenameSubmit()
-                if (e.key === 'Escape') setIsEditing(false)
-              }}
-              autoFocus
-              style={{
-                fontSize: '13px',
-                fontWeight: '600',
-                padding: '2px 6px',
-                border: '1px solid var(--color-primary)',
-                borderRadius: '4px',
-                outline: 'none',
-                width: '100%',
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-on-surface)',
-              }}
-            />
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                onBlur={handleRenameSubmit}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleRenameSubmit()
+                  if (e.key === 'Escape') setIsEditing(false)
+                }}
+                autoFocus
+                style={{
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  padding: '2px 6px',
+                  border: '1px solid var(--color-primary)',
+                  borderRadius: '4px',
+                  outline: 'none',
+                  width: '100%',
+                  backgroundColor: 'var(--color-surface)',
+                  color: 'var(--color-on-surface)',
+                }}
+              />
+              {isRenaming && (
+                <div style={{ position: 'absolute', top: '50%', right: 8, transform: 'translateY(-50%)' }}>
+                  <TailSpin height={16} width={16} color="var(--color-primary)" ariaLabel="renaming-column" />
+                </div>
+              )}
+            </div>
           ) : (
             <h3
               onClick={() => setIsEditing(true)}
@@ -131,10 +156,11 @@ export default function KanbanColumn({ columnId, title, tasks, onCardClick, acti
         <div style={{ position: 'relative' }} ref={menuRef}>
           <button
             type="button"
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="p-1 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center cursor-pointer"
-            style={{ color: 'var(--color-on-surface-variant)' }}
+            onClick={() => !isProcessing && setMenuOpen(!menuOpen)}
+            className="p-1 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center"
+            style={{ color: 'var(--color-on-surface-variant)', cursor: isProcessing ? 'not-allowed' : 'pointer' }}
             aria-label="Column options"
+            disabled={isProcessing}
           >
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>more_horiz</span>
           </button>
@@ -158,13 +184,13 @@ export default function KanbanColumn({ columnId, title, tasks, onCardClick, acti
             >
               <button
                 type="button"
-                onClick={() => { setIsEditing(true); setMenuOpen(false); }}
+                onClick={() => { if (!isProcessing) { setIsEditing(true); setMenuOpen(false); } }}
                 style={{
                   padding: '8px 12px',
                   textAlign: 'left',
                   background: 'none',
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: isProcessing ? 'not-allowed' : 'pointer',
                   fontSize: '13px',
                   color: 'var(--color-on-surface)',
                   display: 'flex',
@@ -172,10 +198,15 @@ export default function KanbanColumn({ columnId, title, tasks, onCardClick, acti
                   gap: '8px',
                   transition: 'background-color 0.15s'
                 }}
-                className="hover:bg-slate-50"
+                className={isProcessing ? '' : 'hover:bg-slate-50'}
+                disabled={isProcessing}
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>edit</span>
-                Rename
+                {isRenaming ? (
+                  <TailSpin height={16} width={16} color="var(--color-on-surface)" ariaLabel="renaming" />
+                ) : (
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>edit</span>
+                )}
+                {isRenaming ? 'Renaming…' : 'Rename'}
               </button>
               <button
                 type="button"
@@ -185,7 +216,7 @@ export default function KanbanColumn({ columnId, title, tasks, onCardClick, acti
                   textAlign: 'left',
                   background: 'none',
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: isProcessing ? 'not-allowed' : 'pointer',
                   fontSize: '13px',
                   color: 'var(--color-error)',
                   display: 'flex',
@@ -193,10 +224,15 @@ export default function KanbanColumn({ columnId, title, tasks, onCardClick, acti
                   gap: '8px',
                   transition: 'background-color 0.15s'
                 }}
-                className="hover:bg-red-50"
+                className={isProcessing ? '' : 'hover:bg-red-50'}
+                disabled={isProcessing}
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
-                Delete
+                {isDeleting ? (
+                  <TailSpin height={16} width={16} color="var(--color-error)" ariaLabel="deleting" />
+                ) : (
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
+                )}
+                {isDeleting ? 'Deleting…' : 'Delete'}
               </button>
             </div>
           )}
