@@ -18,27 +18,7 @@ export const registerController = async (req, res, next) => {
   }
 };
 
-export const verifyUserController = async (req, res, next) => {
-  try {
-    const user = await authService.verifyUser(req.body);
 
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        {
-          id: user.id,
-          name: user.name,
-          username: user.username,
-          email: user.email,
-          isVerified: user.isVerified,
-        },
-        "Email sent successfully"
-      )
-    );
-  } catch (error) {
-    next(error);
-  }
-};
 
 export const verifyOtpController = async (req, res, next) => {
   try {

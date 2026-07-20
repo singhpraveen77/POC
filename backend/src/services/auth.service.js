@@ -89,44 +89,6 @@ export const register = async (data) => {
   };
 };
 
-export const verifyUser = async (data) => {
-  const { email } = data;
-  logger.info(`[AuthService] Resending OTP for email: ${email}`);
-
-  if (!email) {
-    throw new AppError("Email is required", 400);
-  }
-
-  let user = await findByEmail(email);
-
-  if (!user) {
-    logger.warn(`[AuthService] Resend OTP failed: User ${email} not found`);
-    throw new AppError("Invalid email", 401);
-  }
-
-  const otp = Math.floor(1000 + Math.random() * 9000).toString();
-  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
-  
-  logger.info("[AuthService] New OTP generated");
-
-  const subject = "Verify your account - OTP Resend";
-  const html = verifyEmailTemplate(user.name, otp);
-
-  try {
-    await sendMail(email, subject, html);
-    logger.info("[AuthService] Resent OTP email successfully");
-  } catch (mailError) {
-    logger.error(`[AuthService] Failed to send verification resend email via Brevo: ${mailError.message}`);
-    logger.warn(`[DEVELOPMENT OTP BYPASS] Email delivery failed. For testing/verification, your OTP is: ${otp}`);
-  }
-
-  user = await updateUser(user.id, {
-    emailVerificationToken: otp,
-    emailVerificationExpire: otpExpiry
-  });
-
-  return user;
-};
 
 export const verifyOtp = async (data) => {
   const { email, otp } = data;
@@ -245,6 +207,7 @@ export const sendVerificationCode = async (data) => {
     await sendMail(email, subject, html);
     logger.info(`[AuthService] Sent OTP email to: ${email}`);
   } catch (mailError) {
+    throw new AppError("email service failed", 500);
     logger.error(`[AuthService] Failed to send verification code email via Brevo: ${mailError.message}`);
     logger.warn(`[DEVELOPMENT OTP BYPASS] Email delivery failed. For testing/verification, your OTP is: ${otp}`);
   }

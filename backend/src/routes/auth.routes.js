@@ -4,7 +4,6 @@ import {
   registerController,
   verifyOtpController,
   loginController,
-  verifyUserController,
   logoutController,
   getMeController,
   bypassController,
@@ -18,7 +17,6 @@ import {
   registerSchema,
   verifyOtpSchema,
   loginSchema,
-  verifyUserSchema,
   sendVerificationCodeSchema,
   verifyEmailSchema
 } from "../validators/auth.validators.js";
@@ -60,11 +58,6 @@ authRoutes.post(
   bypassController
 );
 
-authRoutes.post(
-  "/verify-user",
-  validate(verifyUserSchema),
-  verifyUserController
-)
 
 authRoutes.post(
   "/logout",
