@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { register } from '../redux/auth/authThunk'
 import Button from '../components/common/Button'
-import { extractFieldErrors } from '../utils/errorHelper'
+import { extractFieldErrors, extractFieldErrorsRegister } from '../utils/errorHelper'
 import toast from 'react-hot-toast'
 
 import AuthInput from '../components/auth/AuthInput'
+import { registerSchema } from '../validators/auth.validators'
 
 export default function SignupPage() {
   const dispatch = useDispatch()
@@ -25,18 +26,24 @@ export default function SignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setErrors({})
-    
-    const nextErrors = {}
-    if (!fields.name) nextErrors.name = 'Name is required'
-    if (!fields.username) nextErrors.username = 'Username is required'
-    if (!fields.email) nextErrors.email = 'Email is required'
-    if (!fields.password) nextErrors.password = 'Password is required'
-    if (fields.password !== fields.confirmPassword) nextErrors.confirmPassword = 'Passwords do not match'
+    setErrors({});
+    console.log(" this is the handle submit called ")
 
-    if (Object.keys(nextErrors).length > 0) {
-      setErrors(nextErrors)
-      return
+    const result = registerSchema.safeParse(fields);
+
+    if (!result.success) {
+      const validationErrors = {};
+
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0];
+
+        if (!validationErrors[field]) {
+          validationErrors[field] = issue.message;
+        }
+      });
+
+      setErrors(validationErrors);
+      return;
     }
 
     setLoading(true)
@@ -48,12 +55,20 @@ export default function SignupPage() {
         password: fields.password
       })).unwrap()
       toast.success("Account created successfully! Please verify your email.")
+      console.log("executed perfectly ");
       navigate('/verify-email/code', { replace: true, state: { email: fields.email } })
     } catch (err) {
-      const fieldErrors = extractFieldErrors(err)
+      console.log("ERR:", err);
+      console.log("FIELD ERRORS:", err?.errors?.fieldErrors);
+
+      const fieldErrors = extractFieldErrorsRegister(err);
+      console.log("EXTRACTED:", fieldErrors);
       if (Object.keys(fieldErrors).length > 0) {
+        console.log("Setting errors...");
         setErrors(fieldErrors)
+        console.log("Setted  errors...",fieldErrors);
       } else {
+        console.log("error else block ")
         toast.error(typeof err === "string" ? err : "Registration failed")
       }
     } finally {
@@ -80,7 +95,7 @@ export default function SignupPage() {
           
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} noValidate>
+        <form onSubmit={(e)=>{handleSubmit(e)}} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} noValidate>
           <AuthInput
             id="name"
             label="Full Name"
@@ -127,7 +142,7 @@ export default function SignupPage() {
           />
 
           <Button
-            type="submit"
+            type='submit'
             variant="solid"
             style={{ height: '42px', marginTop: '12px', justifyContent: 'center', fontWeight: 700 }}
             loading={loading}

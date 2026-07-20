@@ -7,6 +7,7 @@ import AuthInput from "../components/auth/AuthInput";
 import Button from "../components/common/Button";
 import { extractFieldErrors } from "../utils/errorHelper";
 import toast from "react-hot-toast";
+import { loginSchema } from "../validators/auth.validators";
 
 export default function LoginPage() {
   const dispatch = useDispatch();
@@ -44,37 +45,66 @@ export default function LoginPage() {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrors({});
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setErrors({});
 
-    if (!validateLoginFields()) return;
+  const result = loginSchema.safeParse({
+    email,
+    password,
+  });
 
-    try {
-      await dispatch(
-        login({
-          email: email.trim(),
-          password,
-        })
-      ).unwrap();
+  if (!result.success) {
+    const validationErrors = {};
 
-      toast.success("Successfully logged in!");
-      navigate("/", { replace: true });
-    } catch (err) {
-      console.log(err);
-      if (err === "Please verify your email first" || err === "Email registered but not verified") {
-        toast.error("Please verify your email first.");
-        navigate("/verify-email", { state: { email: email.trim() } });
+    result.error.issues.forEach((issue) => {
+      const field = issue.path[0];
+
+      if (!validationErrors[field]) {
+        validationErrors[field] = issue.message;
+      }
+    });
+
+    setErrors(validationErrors);
+    return;
+  }
+
+  try {
+    await dispatch(
+      login({
+        email: email.trim(),
+        password,
+      })
+    ).unwrap();
+
+    toast.success("Successfully logged in!");
+    navigate("/", { replace: true });
+  } catch (err) {
+    console.log(err);
+
+    if (
+      err === "Please verify your email first" ||
+      err === "Email registered but not verified"
+    ) {
+      toast.error("Please verify your email first.");
+      navigate("/verify-email", {
+        state: { email: email.trim() },
+      });
+    } else {
+      const fieldErrors = extractFieldErrors(err);
+
+      if (Object.keys(fieldErrors).length > 0) {
+        setErrors(fieldErrors);
       } else {
-        const fields = extractFieldErrors(err);
-        if (Object.keys(fields).length > 0) {
-          setErrors(fields);
-        } else {
-          toast.error(typeof err === "string" ? err : "Invalid email or password");
-        }
+        toast.error(
+          typeof err === "string"
+            ? err
+            : "Invalid email or password"
+        );
       }
     }
-  };
+  }
+};
 
   return (
     <div
@@ -129,7 +159,7 @@ export default function LoginPage() {
         </div>
 
         <form
-          onSubmit={handleSubmit}
+          onSubmit={(e)=>{handleSubmit(e)}}
           style={{
             display: "flex",
             flexDirection: "column",
