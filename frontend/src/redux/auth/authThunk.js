@@ -94,23 +94,7 @@ export const login = createAsyncThunk(
 );
 
 
-export const verifyUser = createAsyncThunk(
-  "auth/verifyUser",
-  async (data, { rejectWithValue }) => {
-    try {
-      const res = await axiosInstance.post("/auth/verify-user", data);
 
-      return {
-        user: res.data.data,
-        message: res.data.message,
-      };
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Verification failed"
-      );
-    }
-  }
-);
 
 export const checkAuth = createAsyncThunk(
   "auth/checkAuth",

@@ -125,6 +125,11 @@ body {
   box-sizing: border-box;
 }
 
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
 /* ── Responsive Utilities ───────────────────────── */
 @media (min-width: 768px) {
   .mobile-only {

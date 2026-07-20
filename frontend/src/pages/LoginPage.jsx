@@ -64,7 +64,7 @@ export default function LoginPage() {
       console.log(err);
       if (err === "Please verify your email first" || err === "Email registered but not verified") {
         toast.error("Please verify your email first.");
-        navigate("/verify-email/code", { state: { email: email.trim() } });
+        navigate("/verify-email", { state: { email: email.trim() } });
       } else {
         const fields = extractFieldErrors(err);
         if (Object.keys(fields).length > 0) {

@@ -10,7 +10,6 @@ export const setupAxiosInterceptors = (store) => {
     (error) => {
       if (error.response) {
         if (error.response.status === 401) {
-          toast.error('Session expired. Please log in again.');
           store.dispatch(logout());
         } else if (error.response.status >= 500) {
           toast.error('Server error. Please try again later.');

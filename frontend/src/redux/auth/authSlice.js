@@ -4,7 +4,6 @@ import {
   register,
   verifyOtp,
   login,
-  verifyUser,
   checkAuth,
   logoutUser,
   sendVerificationCode,
@@ -101,18 +100,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(verifyUser.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(verifyUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload.user;
-        state.message = action.payload.message;
-      })
-      .addCase(verifyUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+      
       .addCase(checkAuth.pending, (state) => {
         state.loading = true;
       })

@@ -14,7 +14,6 @@ import BoardList from './pages/BoardList'
 import KanbanBoard from './components/kanban/KanbanBoard'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
-import VerifyOtpPage from './pages/VerifyOtpPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
 import VerifyEmailCodePage from './pages/VerifyEmailCodePage'
 
@@ -51,22 +50,7 @@ export default function App() {
               </RedirectIfAuth>
             }
           />
-          <Route
-            path="/verify-otp"
-            element={
-              <RedirectIfAuth>
-                <VerifyEmailPage />
-              </RedirectIfAuth>
-            }
-          />
-          <Route
-            path="/verify-otp/code"
-            element={
-              <RedirectIfAuth>
-                <VerifyEmailCodePage />
-              </RedirectIfAuth>
-            }
-          />
+      
           <Route
             path="/verify-email"
             element={
