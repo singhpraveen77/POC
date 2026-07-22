@@ -8,7 +8,8 @@ import {
   getMeController,
   bypassController,
   sendVerificationCodeController,
-  verifyEmailController
+  verifyEmailController,
+  refreshTokenController
 } from "../controllers/auth.controller.js";
 
 import { validate } from "../middleware/validate.js";
@@ -58,13 +59,19 @@ authRoutes.post(
   bypassController
 );
 
+authRoutes.post(
+  "/refresh-token",
+  authenticateRefreshToken,
+  refreshTokenController
+);
+
 
 authRoutes.post(
   "/logout",
   logoutController
 );
 
-import { authenticate } from "../middleware/auth.middleware.js";
+import { authenticate, authenticateRefreshToken } from "../middleware/auth.middleware.js";
 
 authRoutes.get(
   "/me",

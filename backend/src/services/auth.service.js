@@ -7,15 +7,17 @@ import {
   updateUser,
 } from "../repositories/user.repo.js";
 
-import { hashPassword } from "../utils/hashPass.js";
+import { hashPassword, hashToken } from "../utils/hash.js";
 import { sendMail } from "../utils/sendMail.js";
 import logger from "../../config/logger.js";
 import { verifyEmailTemplate } from "../../templates/email.verify.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import AppError from "../utils/AppError.js";
 
-import { isMatch } from "../utils/hashPass.js";
+import { isMatch } from "../utils/hash.js";
 import { generateAccessToken } from "../utils/jwt.js";
+import { createRefreshToken } from "../repositories/refreshToken.repository.js";
+import { generateRefreshString } from "../utils/RefreshString.js";
 
 export const register = async (data) => {
   const { name, username, email, password } = data;
@@ -89,7 +91,6 @@ export const register = async (data) => {
   };
 };
 
-
 export const verifyOtp = async (data) => {
   const { email, otp } = data;
   logger.info(`[AuthService] Verifying OTP for email: ${email}`);
@@ -161,6 +162,21 @@ export const login = async (data) => {
     isVerified: user.isVerified,
   };
 };
+
+
+export const generateRefreshToken = async (user) => {
+  const refreshToken = generateRefreshString();
+  const tokenHash = hashToken(refreshToken);
+
+  await createRefreshToken({
+    userId: user.id,
+    tokenHash,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  });
+
+  return refreshToken;
+};
+
 
 export const bypass = async (data)=>{
     const {password}=data;
@@ -262,4 +278,5 @@ export const verifyEmail = async (data) => {
   logger.info(`[AuthService] Email verification successful for user: ${email}`);
   return updatedUser;
 };
+
 

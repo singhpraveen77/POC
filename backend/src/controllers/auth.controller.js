@@ -1,5 +1,7 @@
+import { deleteRefreshToken } from "../repositories/refreshToken.repository.js";
 import * as authService from "../services/auth.service.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { hashToken } from "../utils/hash.js";
 import { generateAccessToken } from "../utils/jwt.js";
 
 export const registerController = async (req, res, next) => {
@@ -46,22 +48,33 @@ export const loginController = async (req, res, next) => {
   try {
     const user = await authService.login(req.body);
 
-    const token = generateAccessToken({
+    const accessToken = generateAccessToken({
       userId: user.id,
       email: user.email,
     });
 
-    res.cookie("accessToken", token, {
+    const refreshToken = await authService.generateRefreshToken(user);
+
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 15*60* 1000, // 15 minutes
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     return res.status(200).json(
       new ApiResponse(
         200,
-        { user },
+        {
+          user,
+        },
         "Login successful"
       )
     );
@@ -72,12 +85,33 @@ export const loginController = async (req, res, next) => {
 
 export const logoutController = async (req, res, next) => {
   try {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (refreshToken) {
+      const tokenHash = hashToken(refreshToken);
+
+      await deleteRefreshToken(tokenHash);
+    }
+
     res.clearCookie("accessToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
-    return res.status(200).json(new ApiResponse(200, null, "Logout successful"));
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        null,
+        "Logout successful"
+      )
+    );
   } catch (error) {
     next(error);
   }
@@ -125,6 +159,40 @@ export const verifyEmailController = async (req, res, next) => {
           isVerified: user.isVerified,
         },
         "Email verified successfully."
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const refreshTokenController = async (req, res, next) => {
+  try {
+    const user = req.user;
+
+    const accessToken = generateAccessToken({
+      userId: user.id,
+      email: user.email,
+    });
+
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        null,
+        "Access token refreshed"
       )
     );
   } catch (error) {

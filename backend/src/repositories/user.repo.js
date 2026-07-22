@@ -54,6 +54,9 @@ const getOtp=  (id)=>{
     })
 }
 
+
+
+
 export {
     findByEmail,
     findByUsername,

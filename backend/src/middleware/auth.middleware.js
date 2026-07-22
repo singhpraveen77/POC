@@ -1,3 +1,4 @@
+import { verifyRefreshToken } from "../helper/auth.helper.js";
 import { findById } from "../repositories/user.repo.js";
 import AppError from "../utils/AppError.js";
 import { verifyAccessToken } from "../utils/jwt.js";
@@ -29,3 +30,22 @@ export const authenticate = async (req, res, next) => {
     return next(new AppError("Invalid or expired token", 401));
   }
 };
+export const authenticateRefreshToken = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+      return next(new AppError("Refresh token required", 401));
+    }
+
+    const validToken = await verifyRefreshToken(refreshToken);
+
+    req.user = validToken.user;
+    req.refreshToken = validToken;
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+

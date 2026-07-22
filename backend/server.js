@@ -7,7 +7,7 @@ import prisma from "./config/prisma.js";
 dotenv.config();
 
 process.on("uncaughtException", (err) => {
-  logger.error("UNCAUGHT EXCEPTION! 💥");
+  logger.error("UNCAUGHT EXCEPTION!");
   logger.error(err);
   process.exit(1);
 });
@@ -18,11 +18,11 @@ const startServer = async () => {
     await connectDB();
 
     const server = app.listen(process.env.PORT, () => {
-      logger.info(`🚀 Server running on port ${process.env.PORT}`);
+      logger.info(` Server running on port ${process.env.PORT}`);
     });
 
     process.on("unhandledRejection", (err) => {
-      logger.error("UNHANDLED REJECTION! 💥");
+      logger.error("UNHANDLED REJECTION!");
       logger.error(err);
 
       server.close(() => {
@@ -31,7 +31,7 @@ const startServer = async () => {
     });
 
   } catch (err) {
-    logger.error("❌ Failed to connect to the database.");
+    logger.error("Failed to connect to the database.");
     logger.error(err);
     process.exit(1);
   }
