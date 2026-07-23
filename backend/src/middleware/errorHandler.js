@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import logger from "../../config/logger.js";
 import { Prisma } from "@prisma/client";
 
@@ -9,23 +10,23 @@ import { Prisma } from "@prisma/client";
     url: req.originalUrl,
   });
 
-  let statusCode = err.statusCode || 500;
+  let statusCode = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
   let message = err.message || "Internal Server Error";
   let errors = err.errors || null;
 
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === 'P2002') {
-      statusCode = 400;
+      statusCode = StatusCodes.BAD_REQUEST;
       message = `Duplicate field value entered.`;
     } else if (err.code === 'P2025') {
-      statusCode = 404;
+      statusCode = StatusCodes.NOT_FOUND;
       message = "Record not found.";
     } else {
-      statusCode = 400;
+      statusCode = StatusCodes.BAD_REQUEST;
       message = `Database error: ${err.message}`;
     }
   } else if (err instanceof Prisma.PrismaClientValidationError) {
-    statusCode = 400;
+    statusCode = StatusCodes.BAD_REQUEST;
     message = "Invalid data format provided.";
   }
 

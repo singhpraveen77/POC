@@ -8,6 +8,8 @@ import workspaceRoutes from "./src/routes/workspace.routes.js";
 import boardRoutes from "./src/routes/board.routes.js";
 import columnRoutes from "./src/routes/column.routes.js";
 import taskRoutes from "./src/routes/task.routes.js";
+import { StatusCodes } from "http-status-codes";
+import profileRoutes from "./src/routes/profile.routes.js";
 
 const app = express();
 
@@ -49,6 +51,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
 app.use("/api/workspaces", workspaceRoutes);
 app.use("/api/boards", boardRoutes);
 app.use("/api/columns", columnRoutes);

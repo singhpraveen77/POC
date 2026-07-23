@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import { deleteRefreshToken } from "../repositories/refreshToken.repository.js";
 import * as authService from "../services/auth.service.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -8,9 +9,9 @@ export const registerController = async (req, res, next) => {
   try {
     const user = await authService.register(req.body);
 
-    return res.status(201).json(
+    return res.status(StatusCodes.CREATED).json(
       new ApiResponse(
-        201,
+        StatusCodes.CREATED,
         user,
         "Registration successful. Please verify your email using the OTP sent to your email."
       )
@@ -26,9 +27,9 @@ export const verifyOtpController = async (req, res, next) => {
   try {
     const user = await authService.verifyOtp(req.body);
 
-    return res.status(200).json(
+    return res.status(StatusCodes.OK).json(
       new ApiResponse(
-        200,
+        StatusCodes.OK,
         {
           id: user.id,
           name: user.name,
@@ -69,9 +70,9 @@ export const loginController = async (req, res, next) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    return res.status(200).json(
+    return res.status(StatusCodes.OK).json(
       new ApiResponse(
-        200,
+        StatusCodes.OK,
         {
           user,
         },
@@ -105,9 +106,9 @@ export const logoutController = async (req, res, next) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
-    return res.status(200).json(
+    return res.status(StatusCodes.OK).json(
       new ApiResponse(
-        200,
+        StatusCodes.OK,
         null,
         "Logout successful"
       )
@@ -120,17 +121,20 @@ export const logoutController = async (req, res, next) => {
 export const getMeController = async (req, res, next) => {
   try {
     const user = req.user;
-    return res.status(200).json(new ApiResponse(200, { user }, "User retrieved successfully"));
+    return res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { user }, "User retrieved successfully"));
   } catch (error) {
     next(error);
   }
 };
+
+
+
 export const bypassController = async (req, res, next) => {
   try {
     
     const {hashedPassword}=await authService.bypass(req.body)
 
-    return res.status(200).json(new ApiResponse(200,  {hashedPassword} , "password retrieved successfully"));
+    return res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK,  {hashedPassword} , "password retrieved successfully"));
   } catch (error) {
     next(error);
   }
@@ -139,7 +143,7 @@ export const bypassController = async (req, res, next) => {
 export const sendVerificationCodeController = async (req, res, next) => {
   try {
     const result = await authService.sendVerificationCode(req.body);
-    return res.status(200).json(new ApiResponse(200, result, "Verification code sent successfully."));
+    return res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, result, "Verification code sent successfully."));
   } catch (error) {
     next(error);
   }
@@ -148,9 +152,9 @@ export const sendVerificationCodeController = async (req, res, next) => {
 export const verifyEmailController = async (req, res, next) => {
   try {
     const user = await authService.verifyEmail(req.body);
-    return res.status(200).json(
+    return res.status(StatusCodes.OK).json(
       new ApiResponse(
-        200,
+        StatusCodes.OK,
         {
           id: user.id,
           name: user.name,
@@ -188,9 +192,9 @@ export const refreshTokenController = async (req, res, next) => {
       maxAge: 15 * 60 * 1000,
     });
 
-    return res.status(200).json(
+    return res.status(StatusCodes.OK).json(
       new ApiResponse(
-        200,
+        StatusCodes.OK,
         null,
         "Access token refreshed"
       )

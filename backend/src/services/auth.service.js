@@ -5,6 +5,7 @@ import {
   findByUsername,
   getOtp,
   updateUser,
+  getProfileById
 } from "../repositories/user.repo.js";
 
 import { hashPassword, hashToken } from "../utils/hash.js";
@@ -18,6 +19,7 @@ import { isMatch } from "../utils/hash.js";
 import { generateAccessToken } from "../utils/jwt.js";
 import { createRefreshToken } from "../repositories/refreshToken.repository.js";
 import { generateRefreshString } from "../utils/RefreshString.js";
+import { StatusCodes } from "http-status-codes";
 
 export const register = async (data) => {
   const { name, username, email, password } = data;
@@ -42,16 +44,16 @@ export const register = async (data) => {
         emailVerificationExpire: otpExpiry,
       });
 
-      throw new AppError("Email registered but not verified", 403);
+      throw new AppError("Email registered but not verified", StatusCodes.FORBIDDEN);
     }
-    throw new AppError("Email already registered", 409);
+    throw new AppError("Email already registered", StatusCodes.CONFLICT);
   }
     
     logger.info("unique user verified ")
   const existingUsername = await findByUsername(username);
 
   if (existingUsername) {
-    throw new AppError("Username already taken", 409);
+    throw new AppError("Username already taken", StatusCodes.CONFLICT);
   }
 
   const hashedPassword = await hashPassword(password);
@@ -99,22 +101,22 @@ export const verifyOtp = async (data) => {
 
   if (!user) {
     logger.warn(`[AuthService] User with email ${email} not found during OTP verification`);
-    throw new AppError("User not found", 404);
+    throw new AppError("User not found", StatusCodes.NOT_FOUND);
   }
 
   if (user.isVerified) {
     logger.warn(`[AuthService] User ${email} is already verified`);
-    throw new AppError("User already verified", 400);
+    throw new AppError("User already verified", StatusCodes.BAD_REQUEST);
   }
 
   if (new Date() > user.emailVerificationExpire) {
     logger.warn(`[AuthService] OTP expired for user ${email}`);
-    throw new AppError("OTP expired", 410);
+    throw new AppError("OTP expired", StatusCodes.GONE);
   }
 
   if (user.emailVerificationToken !== otp) {
     logger.warn(`[AuthService] Invalid OTP provided for user ${email}`);
-    throw new AppError("Invalid OTP", 400);
+    throw new AppError("Invalid OTP", StatusCodes.BAD_REQUEST);
   }
 
   logger.info(`[AuthService] OTP successfully matched. Updating user status to verified.`);
@@ -136,13 +138,13 @@ export const login = async (data) => {
   
   if (!user) {
     logger.warn(`[AuthService] Login failed: User ${email} not found`);
-    throw new AppError("Invalid email or password", 401);
+    throw new AppError("Invalid email or password", StatusCodes.UNAUTHORIZED);
   }
 
   logger.info(`[AuthService] User found. Checking verification status.`);
   if (!user.isVerified) {
     logger.warn(`[AuthService] Login failed: User ${email} is not verified`);
-    throw new AppError("Please verify your email first", 403);
+    throw new AppError("Please verify your email first", StatusCodes.FORBIDDEN);
   }
 
   logger.info(`[AuthService] Verifying password matches`);
@@ -150,7 +152,7 @@ export const login = async (data) => {
 
   if (!validPassword) {
     logger.warn(`[AuthService] Login failed: Incorrect password for user ${email}`);
-    throw new AppError("Invalid email or password", 401);
+    throw new AppError("Invalid email or password", StatusCodes.UNAUTHORIZED);
   }
 
   logger.info(`[AuthService] Password verified successfully. Login successful.`);
@@ -162,6 +164,8 @@ export const login = async (data) => {
     isVerified: user.isVerified,
   };
 };
+
+
 
 
 export const generateRefreshToken = async (user) => {
@@ -182,7 +186,7 @@ export const bypass = async (data)=>{
     const {password}=data;
     if(!password){
 
-        throw new AppError("password not found in body", 400);
+        throw new AppError("password not found in body", StatusCodes.BAD_REQUEST);
     }
 
 
@@ -201,12 +205,12 @@ export const sendVerificationCode = async (data) => {
   const user = await findByEmail(email);
   if (!user) {
     logger.warn(`[AuthService] Send verification code failed: User with email ${email} not found`);
-    throw new AppError("User not found", 404);
+    throw new AppError("User not found", StatusCodes.NOT_FOUND);
   }
 
   if (user.isVerified) {
     logger.warn(`[AuthService] Send verification code failed: User ${email} is already verified`);
-    throw new AppError("User already verified", 400);
+    throw new AppError("User already verified", StatusCodes.BAD_REQUEST);
   }
 
   // Generate 6-digit secure OTP
@@ -244,28 +248,28 @@ export const verifyEmail = async (data) => {
   const user = await findByEmail(email);
   if (!user) {
     logger.warn(`[AuthService] Verification failed: User with email ${email} not found`);
-    throw new AppError("User not found", 404);
+    throw new AppError("User not found", StatusCodes.NOT_FOUND);
   }
 
   if (user.isVerified) {
     logger.warn(`[AuthService] Verification failed: User ${email} is already verified`);
-    throw new AppError("User already verified", 400);
+    throw new AppError("User already verified", StatusCodes.BAD_REQUEST);
   }
 
   if (!user.emailVerificationToken || !user.emailVerificationExpire) {
     logger.warn(`[AuthService] Verification failed: No OTP token or expiry found for user ${email}`);
-    throw new AppError("Invalid verification request", 400);
+    throw new AppError("Invalid verification request", StatusCodes.BAD_REQUEST);
   }
 
   if (new Date() > user.emailVerificationExpire) {
     logger.warn(`[AuthService] Verification failed: OTP expired for user ${email}`);
-    throw new AppError("OTP expired", 410);
+    throw new AppError("OTP expired", StatusCodes.GONE);
   }
 
   const match = await isMatch(otp, user.emailVerificationToken);
   if (!match) {
     logger.warn(`[AuthService] Verification failed: Invalid OTP provided for user ${email}`);
-    throw new AppError("Invalid OTP", 400);
+    throw new AppError("Invalid OTP", StatusCodes.BAD_REQUEST);
   }
 
   logger.info(`[AuthService] OTP code successfully validated. Marking user ${email} as verified.`);

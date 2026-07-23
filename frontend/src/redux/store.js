@@ -6,12 +6,14 @@ import boardReducer from "./board/boardSlice";
 import columnReducer from "./column/columnSlice";
 import taskReducer from "./task/taskSlice";
 import toastReducer from "./toast/toastSlice";
+import profileReducer from "./profile/profileSlice"
 
 import frontendLogger from "./middleware/logger";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    profile: profileReducer,
     workspaces: workspaceReducer,
     boards: boardReducer,
     columns: columnReducer,

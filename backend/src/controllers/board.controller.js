@@ -1,10 +1,11 @@
+import { StatusCodes } from "http-status-codes";
 import * as boardService from "../services/board.service.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 export const createBoardController = async (req, res, next) => {
   try {
     const board = await boardService.createBoard(req.user.id, req.body);
-    return res.status(201).json(new ApiResponse(201, board, "Board created successfully"));
+    return res.status(StatusCodes.CREATED).json(new ApiResponse(StatusCodes.CREATED, board, "Board created successfully"));
   } catch (error) {
     next(error);
   }
@@ -14,10 +15,10 @@ export const getBoardsController = async (req, res, next) => {
   try {
     const { workspaceId } = req.query;
     if (!workspaceId) {
-      return res.status(400).json(new ApiResponse(400, null, "workspaceId query parameter is required"));
+      return res.status(StatusCodes.BAD_REQUEST).json(new ApiResponse(StatusCodes.BAD_REQUEST, null, "workspaceId query parameter is required"));
     }
     const boards = await boardService.getBoards(req.user.id, workspaceId);
-    return res.status(200).json(new ApiResponse(200, boards, "Boards retrieved successfully"));
+    return res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, boards, "Boards retrieved successfully"));
   } catch (error) {
     next(error);
   }
@@ -26,7 +27,7 @@ export const getBoardsController = async (req, res, next) => {
 export const getBoardByIdController = async (req, res, next) => {
   try {
     const board = await boardService.getBoardById(req.user.id, req.params.id);
-    return res.status(200).json(new ApiResponse(200, board, "Board retrieved successfully"));
+    return res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, board, "Board retrieved successfully"));
   } catch (error) {
     next(error);
   }
@@ -35,7 +36,7 @@ export const getBoardByIdController = async (req, res, next) => {
 export const updateBoardController = async (req, res, next) => {
   try {
     const board = await boardService.updateBoard(req.user.id, req.params.id, req.body);
-    return res.status(200).json(new ApiResponse(200, board, "Board updated successfully"));
+    return res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, board, "Board updated successfully"));
   } catch (error) {
     next(error);
   }
@@ -44,7 +45,7 @@ export const updateBoardController = async (req, res, next) => {
 export const deleteBoardController = async (req, res, next) => {
   try {
     await boardService.deleteBoard(req.user.id, req.params.id);
-    return res.status(200).json(new ApiResponse(200, null, "Board deleted successfully"));
+    return res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, null, "Board deleted successfully"));
   } catch (error) {
     next(error);
   }

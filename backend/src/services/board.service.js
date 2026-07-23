@@ -2,6 +2,7 @@ import * as boardRepo from "../repositories/board.repository.js";
 import { getWorkspaceById } from "./workspace.service.js";
 import AppError from "../utils/AppError.js";
 import logger from "../../config/logger.js";
+import { StatusCodes } from "http-status-codes";
 
 export const createBoard = async (userId, data) => {
   logger.info(`[BoardService] Starting createBoard for user ${userId} in workspace ${data.workspaceId}`);
@@ -42,7 +43,7 @@ export const getBoardById = async (userId, boardId) => {
   const board = await boardRepo.getBoardById(boardId);
   if (!board) {
     logger.warn(`[BoardService] Board ${boardId} not found`);
-    throw new AppError("Board not found", 404);
+    throw new AppError("Board not found", StatusCodes.NOT_FOUND);
   }
 
   // Ensure user has access to the workspace of the board

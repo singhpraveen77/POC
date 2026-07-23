@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import AppError from "../utils/AppError.js";
 
 export const validate = (schema) => {
@@ -7,7 +8,7 @@ export const validate = (schema) => {
       schema.safeParse(req.body);
 
     if (!result.success) {
-      return next(new AppError("Validation failed", 400, result.error.flatten()));
+      return next(new AppError("Validation failed", StatusCodes.BAD_REQUEST, result.error.flatten()));
 }
 
     req.body = result.data;

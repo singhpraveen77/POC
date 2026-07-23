@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import { verifyRefreshToken } from "../helper/auth.helper.js";
 import { findById } from "../repositories/user.repo.js";
 import AppError from "../utils/AppError.js";
@@ -11,7 +12,7 @@ export const authenticate = async (req, res, next) => {
   }
 
   if (!token) {
-    return next(new AppError("Authentication required", 401));
+    return next(new AppError("Authentication required", StatusCodes.UNAUTHORIZED));
   }
 
   try {
@@ -20,14 +21,14 @@ export const authenticate = async (req, res, next) => {
     const user = await findById(decoded.userId);
 
     if (!user) {
-      return next(new AppError("User not found", 404));
+      return next(new AppError("User not found", StatusCodes.NOT_FOUND));
     }
 
     req.user = user;
 
     next();
   } catch (error) {
-    return next(new AppError("Invalid or expired token", 401));
+    return next(new AppError("Invalid or expired token", StatusCodes.UNAUTHORIZED));
   }
 };
 export const authenticateRefreshToken = async (req, res, next) => {
@@ -35,7 +36,7 @@ export const authenticateRefreshToken = async (req, res, next) => {
     const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
-      return next(new AppError("Refresh token required", 401));
+      return next(new AppError("Refresh token required", StatusCodes.UNAUTHORIZED));
     }
 
     const validToken = await verifyRefreshToken(refreshToken);

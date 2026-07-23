@@ -38,7 +38,7 @@ export const getTaskById = async (userId, taskId) => {
   const task = await taskRepo.getTaskById(taskId);
   if (!task) {
     logger.warn(`[TaskService] Task ${taskId} not found`);
-    throw new AppError("Task not found", 404);
+    throw new AppError("Task not found", StatusCodes.NOT_FOUND);
   }
 
   // Ensure user has access to the column of the task

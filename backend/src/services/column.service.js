@@ -1,6 +1,7 @@
 import * as columnRepo from "../repositories/column.repository.js";
 import { getBoardById } from "./board.service.js";
 import AppError from "../utils/AppError.js";
+import { StatusCodes } from "http-status-codes";
 
 export const createColumn = async (userId, data) => {
   // Verify the user has access to this board
@@ -23,7 +24,7 @@ export const createColumn = async (userId, data) => {
 export const getColumnById = async (userId, columnId) => {
   const column = await columnRepo.getColumnById(columnId);
   if (!column) {
-    throw new AppError("Column not found", 404);
+    throw new AppError("Column not found", StatusCodes.NOT_FOUND);
   }
 
   // Ensure user has access to the board of the column

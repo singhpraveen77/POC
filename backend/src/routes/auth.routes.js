@@ -9,7 +9,8 @@ import {
   bypassController,
   sendVerificationCodeController,
   verifyEmailController,
-  refreshTokenController
+  refreshTokenController,
+  
 } from "../controllers/auth.controller.js";
 
 import { validate } from "../middleware/validate.js";
@@ -21,7 +22,9 @@ import {
   sendVerificationCodeSchema,
   verifyEmailSchema
 } from "../validators/auth.validators.js";
+
 import { verifyOtp } from "../services/auth.service.js";
+import { authenticate, authenticateRefreshToken } from "../middleware/auth.middleware.js";
 
 const authRoutes = Router();
 
@@ -71,12 +74,11 @@ authRoutes.post(
   logoutController
 );
 
-import { authenticate, authenticateRefreshToken } from "../middleware/auth.middleware.js";
-
 authRoutes.get(
   "/me",
   authenticate,
   getMeController
 );
+
 
 export default authRoutes;

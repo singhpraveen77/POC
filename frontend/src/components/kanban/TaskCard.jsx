@@ -55,14 +55,6 @@ export default function TaskCard({ task, isDone = false, onClick }) {
           <span className="material-symbols-outlined" style={{ fontSize: 15 }}>edit</span>
         </button>
 
-        {/* ID */}
-        <span
-          className="font-mono text-[11px] font-semibold tracking-wide"
-          style={{ color: 'var(--color-outline)' }}
-        >
-          {task.id}
-        </span>
-
         {/* Title */}
         {isDone ? (
           <div className="flex items-center gap-2">

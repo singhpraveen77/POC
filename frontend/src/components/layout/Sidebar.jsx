@@ -34,11 +34,7 @@ export default function Sidebar({ isOpen, onClose }) {
     }
   }, [status, dispatch])
 
-  function handleLogout() {
-    dispatch(logoutUser()).then(() => {
-      navigate('/login', { replace: true })
-    })
-  }
+  
 
   const toggleWorkspace = (id, e) => {
     e.preventDefault()
@@ -301,30 +297,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
       {/* Footer Navigation */}
       <div style={{ borderTop: '1px solid var(--color-outline-variant)', paddingTop: 16, marginTop: 'auto' }}>
-        <button
-          type="button" 
-          onClick={handleLogout}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            width: '100%',
-            padding: '10px 12px',
-            borderRadius: 6,
-            backgroundColor: 'transparent',
-            border: 'none',
-            color: 'var(--color-error)',
-            fontSize: 13.5,
-            fontWeight: 600,
-            textAlign: 'left',
-            cursor: 'pointer',
-            transition: 'background-color 0.2s',
-          }}
-          className="hover:bg-red-50"
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>logout</span>
-          Logout Account
-        </button>
+        
       </div>
 
       {/* Create Workspace Modal */}

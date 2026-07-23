@@ -16,6 +16,7 @@ import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
 import VerifyEmailCodePage from './pages/VerifyEmailCodePage'
+import ProfilePage from './pages/ProfilePage'
 
 export default function App() {
   const dispatch = useDispatch();
@@ -73,6 +74,7 @@ export default function App() {
               <Route index element={<WorkspaceList />} />
               <Route path="/workspaces/:workspaceId" element={<BoardList />} />
               <Route path="/boards/:boardId" element={<KanbanBoard />} />
+              <Route path="/profilePage" element={<ProfilePage />} />
             </Route>
           </Route>
 

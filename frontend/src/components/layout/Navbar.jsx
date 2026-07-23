@@ -1,7 +1,10 @@
 import { useSelector } from 'react-redux'
+import ProfileCard from '../profile/profileCard';
+import { useState } from 'react';
 
 export default function Navbar({ onMenuToggle }) {
   const { user } = useSelector(state => state.auth)
+  const [showProfile, setShowProfile] = useState(false);
 
   return (
     <header
@@ -43,18 +46,54 @@ export default function Navbar({ onMenuToggle }) {
       </div>
 
       {/* Right */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ 
-            width: 32, height: 32, borderRadius: '4px', backgroundColor: 'lightgrey', 
-            color: 'var(--color-on-primary-container)', display: 'flex', alignItems: 'center', 
-            justifyContent: 'center', fontWeight: 'bold' 
-          }}>
-            {user?.name?.charAt(0).toUpperCase()}
-          </div>
-          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-on-surface)' }}>{user?.name}</span>
-        </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+      <div
+        style={{
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+        }}
+        onMouseEnter={() => setShowProfile(true)}
+        onMouseLeave={() => setShowProfile(false)}
+      >
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        cursor: "pointer",
+      }}
+    >
+      <div
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 4,
+          backgroundColor: "lightgrey",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: "bold",
+        }}
+      >
+        {user?.name?.charAt(0).toUpperCase()}
       </div>
+
+      <span
+        style={{
+          fontSize: 14,
+          fontWeight: 500,
+        }}
+      >
+        {user?.name}
+      </span>
+    </div>
+
+    {showProfile && (
+      <ProfileCard/>
+    )}
+      </div>
+    </div>
     </header>
   )
 }

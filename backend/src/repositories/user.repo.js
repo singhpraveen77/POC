@@ -1,6 +1,6 @@
 import prisma from "../../config/prisma.js";
 
-const findByEmail = (email)=>{
+export const findByEmail = (email)=>{
     return prisma.user.findUnique({
         where:{
             email
@@ -8,7 +8,7 @@ const findByEmail = (email)=>{
     });
 };
 
-const findById = (id)=>{
+export const findById = (id)=>{
     return prisma.user.findUnique({
         where:{
             id
@@ -16,7 +16,7 @@ const findById = (id)=>{
     });
 };
 
-const findByUsername = (username)=>{
+export const findByUsername = (username)=>{
     return prisma.user.findUnique({
         where:{
             username
@@ -24,24 +24,32 @@ const findByUsername = (username)=>{
     });
 };
 
-const createUser = (data)=>{
+export const createUser = (data)=>{
     return prisma.user.create({
         data
     });
 };
 
-const updateUser= (id,data)=>{
+export const updateUser= (id,data)=>{
     return prisma.user.update({
         where:{
             id
         },
         data,
-        
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          email: true,
+          isVerified: true,
+          createdAt: true,
+          updatedAt: true,
+        },
     });
 
 };
 
-const getOtp=  (id)=>{
+export const getOtp=  (id)=>{
     return prisma.user.findUnique({
         where:{
             id
@@ -54,16 +62,68 @@ const getOtp=  (id)=>{
     })
 }
 
+export const getProfileById = (userId) => {
+  return prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      name: true,
+      username: true,
+      email: true,
+      isVerified: true,
+      createdAt: true,
 
+      memberships: {
+        take: 5,
+        orderBy: {
+          joinedAt: "desc",
+        },
+        select: {
+          workspace: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+        },
+      },
 
+      boardsCreated: {
+        take: 5,
+        orderBy: {
+          createdAt: "desc",
+        },
+        select: {
+          id: true,
+          name: true,
+          createdAt: true,
+        },
+      },
 
-export {
-    findByEmail,
-    findByUsername,
-    findById,
-    updateUser,
-    createUser,
-    getOtp
+      tasksCreated: {
+        select: {
+          id: true,
+        },
+      },
 
+      assignedTasks: {
+        take: 5,
+        orderBy: {
+          updatedAt: "desc",
+        },
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          priority: true,
+          dueDate: true,
+          updatedAt: true,
+        },
+      },
+    },
+  });
 };
 
