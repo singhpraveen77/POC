@@ -69,7 +69,7 @@ export default function Navbar({ onMenuToggle }) {
         style={{
           width: 32,
           height: 32,
-          borderRadius: 4,
+          borderRadius: "10px",
           backgroundColor: "lightgrey",
           display: "flex",
           alignItems: "center",
@@ -77,7 +77,7 @@ export default function Navbar({ onMenuToggle }) {
           fontWeight: "bold",
         }}
       >
-        <ProfileAvatar size={32} />
+        <ProfileAvatar size={35} />
       </div>
 
       <span

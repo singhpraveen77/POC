@@ -15,11 +15,14 @@ export default function LoginPage() {
 
   const { loading } = useSelector((state) => state.auth);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({});
+  const [fields, setFields] = useState({
+  email: "",
+  password: "",
+});
 
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const [errors, setErrors] = useState({});
+const [touched, setTouched] = useState({});
+
 
   useEffect(() => {
     return () => {
@@ -27,32 +30,55 @@ export default function LoginPage() {
     };
   }, [dispatch]);
 
-  const validateLoginFields = () => {
-    const nextErrors = {};
+  function update(key) {
+  return (e) => {
+    const value = e.target.value;
 
-    if (!email.trim()) {
-      nextErrors.email = "Email is required";
-    } else if (!emailPattern.test(email.trim())) {
-      nextErrors.email = "Enter a valid email";
-    }
+    setTouched((prevTouched) => {
+      const newTouched = {
+        ...prevTouched,
+        [key]: true,
+      };
 
-    if (!password.trim()) {
-      nextErrors.password = "Password is required";
-    }
+      setFields((prevFields) => {
+        const updatedFields = {
+          ...prevFields,
+          [key]: value,
+        };
 
-    setErrors(nextErrors);
+        const result = loginSchema.safeParse(updatedFields);
 
-    return Object.keys(nextErrors).length === 0;
+        const validationErrors = {};
+
+        if (!result.success) {
+          result.error.issues.forEach((issue) => {
+            const field = issue.path[0];
+
+            if (newTouched[field] && !validationErrors[field]) {
+              validationErrors[field] = issue.message;
+            }
+          });
+        }
+
+        setErrors(validationErrors);
+
+        return updatedFields;
+      });
+
+      return newTouched;
+    });
   };
+}
 
 const handleSubmit = async (e) => {
   e.preventDefault();
-  setErrors({});
 
-  const result = loginSchema.safeParse({
-    email,
-    password,
+  setTouched({
+    email: true,
+    password: true,
   });
+
+  const result = loginSchema.safeParse(fields);
 
   if (!result.success) {
     const validationErrors = {};
@@ -69,26 +95,26 @@ const handleSubmit = async (e) => {
     return;
   }
 
+  setErrors({});
+
   try {
     await dispatch(
       login({
-        email: email.trim(),
-        password,
+        email: fields.email.trim(),
+        password: fields.password,
       })
     ).unwrap();
 
     toast.success("Successfully logged in!");
     navigate("/", { replace: true });
   } catch (err) {
-    console.log(err);
-
     if (
       err === "Please verify your email first" ||
       err === "Email registered but not verified"
     ) {
       toast.error("Please verify your email first.");
       navigate("/verify-email", {
-        state: { email: email.trim() },
+        state: { email: fields.email.trim() },
       });
     } else {
       const fieldErrors = extractFieldErrors(err);
@@ -168,35 +194,19 @@ const handleSubmit = async (e) => {
         >
           <AuthInput
             id="email"
-            label="Email Address"
-            type="email"
-            placeholder="praveen@example.com"
-            value={email}
-            autoFocus
+            label="Email"
+            value={fields.email}
+            onChange={update("email")}
             error={errors.email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setErrors((prev) => ({
-                ...prev,
-                email: "",
-              }));
-            }}
           />
 
           <AuthInput
             id="password"
-            label="Password"
             type="password"
-            placeholder="Enter your password"
-            value={password}
+            label="Password"
+            value={fields.password}
+            onChange={update("password")}
             error={errors.password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setErrors((prev) => ({
-                ...prev,
-                password: "",
-              }));
-            }}
           />
 
           <Button

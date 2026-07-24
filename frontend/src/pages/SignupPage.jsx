@@ -13,40 +13,88 @@ export default function SignupPage() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const [fields, setFields] = useState({ name: '', username: '', email: '', password: '', confirmPassword: '' })
-  const [errors, setErrors] = useState({})
-  const [loading, setLoading] = useState(false)
+  const [fields, setFields] = useState({
+    name: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-  function update(key) {
-    return (e) => {
-      setFields(prev => ({ ...prev, [key]: e.target.value }))
-      setErrors(prev => ({ ...prev, [key]: '' }))
-    }
-  }
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setErrors({});
-    console.log(" this is the handle submit called ")
+function update(key) {
+  return (e) => {
+    const value = e.target.value;
 
-    const result = registerSchema.safeParse(fields);
+    setTouched((prevTouched) => {
+      const newTouched = {
+        ...prevTouched,
+        [key]: true,
+      };
 
-    if (!result.success) {
-      const validationErrors = {};
+      setFields((prevFields) => {
+        const updatedFields = {
+          ...prevFields,
+          [key]: value,
+        };
 
-      result.error.issues.forEach((issue) => {
-        const field = issue.path[0];
+        const result = registerSchema.safeParse(updatedFields);
 
-        if (!validationErrors[field]) {
-          validationErrors[field] = issue.message;
+        const validationErrors = {};
+
+        if (!result.success) {
+          result.error.issues.forEach((issue) => {
+            const field = issue.path[0];
+
+            if (newTouched[field] && !validationErrors[field]) {
+              validationErrors[field] = issue.message;
+            }
+          });
         }
+
+        setErrors(validationErrors);
+
+        return updatedFields;
       });
 
-      setErrors(validationErrors);
-      return;
-    }
+      return newTouched;
+    });
+  };
+}
 
-    setLoading(true)
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  setTouched({
+    name: true,
+    username: true,
+    email: true,
+    password: true,
+    confirmPassword: true,
+  });
+
+  const result = registerSchema.safeParse(fields);
+
+  if (!result.success) {
+    const validationErrors = {};
+
+    result.error.issues.forEach((issue) => {
+      const field = issue.path[0];
+
+      if (!validationErrors[field]) {
+        validationErrors[field] = issue.message;
+      }
+    });
+
+    setErrors(validationErrors);
+    return;
+  }
+
+  setErrors({});
+  setLoading(true);
     try {
       await dispatch(register({
         name: fields.name,

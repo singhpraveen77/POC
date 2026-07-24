@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/auth/authThunk";
 import { useNavigate } from "react-router-dom";
+import ProfileAvatar from "./ProfileAvatar";
 
 export default function ProfileCard() {
     const { user } = useSelector(state => state.auth)
@@ -55,7 +56,7 @@ export default function ProfileCard() {
             fontSize: 18,
           }}
         >
-          {user?.name?.charAt(0).toUpperCase()}
+          <ProfileAvatar size={48}/>
         </div>
 
         <div>

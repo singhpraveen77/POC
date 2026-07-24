@@ -37,7 +37,7 @@ export default function BoardCard({ board }) {
           color: "#111827",
         }}
       >
-        > {board.name}
+        {">"} {board.name}
       </div>
 
       <div

@@ -28,7 +28,7 @@ export default function WorkspaceCard({ workspace }) {
           color: "#111827",
         }}
       >
-        -> {workspace.name}
+        {"->"} {workspace.name}
       </div>
 
       <div

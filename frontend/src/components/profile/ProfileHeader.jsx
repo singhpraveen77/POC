@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../common/Button";
+import ProfileAvatar from "./ProfileAvatar";
 
 export default function ProfileHeader({ user }) {
 
@@ -47,7 +48,7 @@ export default function ProfileHeader({ user }) {
             fontWeight: 700,
           }}
         >
-          {user?.name?.charAt(0).toUpperCase()}
+          <ProfileAvatar size={80}/>
         </div>
 
         <div>
@@ -93,9 +94,6 @@ export default function ProfileHeader({ user }) {
                 borderRadius: 20,
                 fontSize: 13,
                 fontWeight: 600,
-                background: user.isVerified
-                  ? "#dcfce7"
-                  : "#fee2e2",
                 color: user.isVerified
                   ? "#15803d"
                   : "#dc2626",
