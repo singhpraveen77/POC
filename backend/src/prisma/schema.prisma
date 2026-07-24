@@ -36,6 +36,9 @@ model User {
   name     String
   username String @unique
   email    String @unique
+  profileImage   String?
+  profileImageId String?
+
 
   // auth
   password                  String

@@ -40,6 +40,8 @@ export const updateUser= (id,data)=>{
           id: true,
           name: true,
           username: true,
+          profileImage:true,
+          profileImageId:true,
           email: true,
           isVerified: true,
           createdAt: true,
@@ -62,8 +64,17 @@ export const getOtp=  (id)=>{
     })
 }
 
+export const updateProfileImage = (userId, data) => {
+  return prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data,
+  });
+};
+
 export const getProfileById = (userId) => {
-  return prisma.user.findUnique({
+   return prisma.user.findUnique({
     where: {
       id: userId,
     },
@@ -72,6 +83,8 @@ export const getProfileById = (userId) => {
       name: true,
       username: true,
       email: true,
+      profileImage:true,
+      profileImageId:true,
       isVerified: true,
       createdAt: true,
 

@@ -5,7 +5,7 @@ import logger from "./config/logger.js";
 import prisma from "./config/prisma.js";
 
 dotenv.config();
-
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 process.on("uncaughtException", (err) => {
   logger.error("UNCAUGHT EXCEPTION!");
   logger.error(err);

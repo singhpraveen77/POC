@@ -227,7 +227,7 @@ export const sendVerificationCode = async (data) => {
     await sendMail(email, subject, html);
     logger.info(`[AuthService] Sent OTP email to: ${email}`);
   } catch (mailError) {
-    throw new AppError("email service failed", 500);
+    throw new AppError("email service failed", StatusCodes.INTERNAL_SERVER_ERROR);
     logger.error(`[AuthService] Failed to send verification code email via Brevo: ${mailError.message}`);
     logger.warn(`[DEVELOPMENT OTP BYPASS] Email delivery failed. For testing/verification, your OTP is: ${otp}`);
   }

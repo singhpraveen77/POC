@@ -1,6 +1,8 @@
 import { StatusCodes } from "http-status-codes";
-import { findByEmail, findById, findByUsername, getProfileById, updateUser } from "../repositories/user.repo.js";
+import { findByEmail, findById, findByUsername, getProfileById, updateProfileImage, updateUser } from "../repositories/user.repo.js";
 import AppError from "../utils/AppError.js";
+import { deleteImage, uploadImage } from "../utils/cloudinary.util.js";
+import logger from "../../config/logger.js";
 
 export const getProfile = async (userId) => {
   const user = await getProfileById(userId);
@@ -28,6 +30,8 @@ export const getProfile = async (userId) => {
       name: user.name,
       username: user.username,
       email: user.email,
+      profileImage:user.profileImage,
+      profileImageId:user.profileImageId,
       isVerified: user.isVerified,
       createdAt: user.createdAt,
     },
@@ -103,4 +107,68 @@ export const updateProfile = async (userId, payload) => {
       updatedAt: updatedUser.updatedAt,
     },
   };
+};
+
+export const uploadProfileImageService = async (userId, file) => {
+  logger.info(`Uploading profile image for user: ${userId}`);
+
+  const user = await findById(userId);
+
+  if (!user) {
+    logger.warn(`User not found: ${userId}`);
+    throw new AppError("User not found.", STATUS_CODES.NOT_FOUND);
+  }
+
+  if (!file) {
+    logger.warn(`No profile image provided by user: ${userId}`);
+    throw new AppError("Profile image is required.", StatusCodes.BAD_REQUEST);
+  }
+
+  if (user.profileImageId) {
+    await deleteImage(user.profileImageId);
+  }
+  logger.info(file);
+  const image = await uploadImage(
+    file.buffer,
+    "kanban/profile",
+    userId
+  );
+
+  const updatedUser = await updateProfileImage(userId, {
+    profileImage: image.secure_url,
+    profileImageId: image.public_id,
+  });
+
+  logger.info(`Profile image uploaded successfully for user: ${userId}`);
+
+  return {
+    profileImage: updatedUser.profileImage,
+  };
+};
+
+export const deleteProfileImageService = async (userId) => {
+  logger.info(`Deleting profile image for user: ${userId}`);
+
+  const user = await findById(userId);
+
+  if (!user) {
+    logger.warn(`User not found: ${userId}`);
+    throw new AppError("User not found.", StatusCodes.NOT_FOUND);
+  }
+
+  if (!user.profileImageId) {
+    logger.warn(`No profile image found for user: ${userId}`);
+    throw new AppError("Profile image not found.", StatusCodes.NOT_FOUND);
+  }
+
+  await deleteImage(user.profileImageId);
+
+  await updateProfileImage(userId, {
+    profileImage: null,
+    profileImageId: null,
+  });
+
+  logger.info(`Profile image deleted successfully for user: ${userId}`);
+
+  return null;
 };
