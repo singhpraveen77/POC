@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux'
 import ProfileCard from '../profile/profileCard';
 import { useState } from 'react';
+import ProfileAvatar from '../profile/ProfileAvatar';
 
 export default function Navbar({ onMenuToggle }) {
   const { user } = useSelector(state => state.auth)
@@ -76,7 +77,7 @@ export default function Navbar({ onMenuToggle }) {
           fontWeight: "bold",
         }}
       >
-        {user?.name?.charAt(0).toUpperCase()}
+        <ProfileAvatar size={32} />
       </div>
 
       <span

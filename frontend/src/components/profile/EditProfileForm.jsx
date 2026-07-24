@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -8,7 +8,7 @@ import Button from "../common/Button";
 import ProfileAvatar from "./ProfileAvatar";
 import ProfileInfoCard from "./ProfileInfoCard";
 
-import { updateProfile } from "../../redux/profile/profileThunk";
+import { updateProfile, uploadProfileImage } from "../../redux/profile/profileThunk";
 import { updateProfileSchema } from "../../validators/profileValidation";
 
 export default function EditProfileForm({ user }) {
@@ -47,6 +47,11 @@ const handleChange = (e) => {
   }));
 };
 
+const fileInputRef = useRef(null);
+
+const handleUploadClick = () => {
+  fileInputRef.current.click();
+};
 
 
 const handleSubmit = async (e) => {
@@ -77,12 +82,48 @@ const handleSubmit = async (e) => {
   }
 };
 
+const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  console.log("file: ",file);
+
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  dispatch(
+    uploadProfileImage(
+      formData,
+    )
+  );
+};
+
   return (
     <ProfileInfoCard
+    
       title="Edit Profile"
       subtitle="Update your personal information."
     >
-      <ProfileAvatar name={formData.name} />
+      <div className="w-full flex justify-center">
+        <ProfileAvatar size={100} />
+      </div>
+      
+
+      <label>
+        <button
+        onClick={handleUploadClick}
+        className="flex justify-center w-full"
+         type="button">
+          Upload
+        </button>
+
+        <input
+         onChange={handleFileChange}
+            ref={fileInputRef}
+            type="file"
+            hidden
+        />
+      </label>
 
       <form
         onSubmit={handleSubmit}

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getProfile, updateProfile  } from "./profileThunk";
+import { getProfile, updateProfile, uploadProfileImage } from "./profileThunk";
 
 const initialState = {
   profile: null,
@@ -38,24 +38,43 @@ const profileSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(updateProfile.pending, (state) => {
-          state.loading = true;
-          state.error = null;
-        })
+        state.loading = true;
+        state.error = null;
+      })
 
-        .addCase(updateProfile.fulfilled, (state, action) => {
-          state.loading = false;
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false;
 
-          if (state.profile) {
-            state.profile.user = action.payload.user;
-          }
-        })
+        if (state.profile) {
+          state.profile.user = action.payload.user;
+        }
+      })
 
-        .addCase(updateProfile.rejected, (state, action) => {
-          state.loading = false;
-          state.error = action.payload;
-        })
-          }
-    });
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(uploadProfileImage.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(uploadProfileImage.fulfilled, (state, action) => {
+        state.loading = false;
+
+        if (state.profile) {
+          state.profile.user.profileImage = action.payload.profileImage;
+        }
+      })
+
+      .addCase(uploadProfileImage.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+  }
+});
+
 
 export const { clearProfile, clearProfileError } =
   profileSlice.actions;
