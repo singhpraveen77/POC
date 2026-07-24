@@ -185,18 +185,49 @@ const boardSlice = createSlice({
         }
       })
       .addCase(updateTask.fulfilled, (state, action) => {
+        // DnD moves are handled optimistically — skip column re-placement on success
+        // so that stale API responses don't overwrite the already-applied UI state.
+        // Only update non-column fields (title, description, etc.) for DnD calls.
+        const isDnd = action.meta?.arg?.data?.isDnd === true;
+
         if (state.currentBoard && state.currentBoard.columns) {
-          state.currentBoard.columns.forEach(c => {
-            if (c.tasks) {
-              c.tasks = c.tasks.filter(t => t.id !== action.payload.id);
+          if (isDnd) {
+            // Just update task fields in-place without touching column placement
+            state.currentBoard.columns.forEach(col => {
+              if (col.tasks) {
+                const idx = col.tasks.findIndex(t => t.id === action.payload.id);
+                if (idx !== -1) {
+                  // Preserve columnId from current state, not from API response
+                  col.tasks[idx] = {
+                    ...action.payload,
+                    columnId: col.tasks[idx].columnId,
+                  };
+                }
+              }
+            });
+            state.lastColumnsBackup = null;
+          } else {
+            // Non-DnD update (modal edit): apply full server response including column
+            state.currentBoard.columns.forEach(c => {
+              if (c.tasks) {
+                c.tasks = c.tasks.filter(t => t.id !== action.payload.id);
+              }
+            });
+            const col = state.currentBoard.columns.find(c => c.id === action.payload.columnId);
+            if (col) {
+              if (!col.tasks) col.tasks = [];
+              col.tasks.push(action.payload);
+              col.tasks.sort((a, b) => a.position - b.position);
             }
-          });
-          const col = state.currentBoard.columns.find(c => c.id === action.payload.columnId);
-          if (col) {
-            if (!col.tasks) col.tasks = [];
-            col.tasks.push(action.payload);
-            col.tasks.sort((a, b) => a.position - b.position);
           }
+        }
+      })
+      .addCase(updateTask.rejected, (state, action) => {
+        // Roll back optimistic DnD move on failure
+        const isDnd = action.meta?.arg?.data?.isDnd === true;
+        if (isDnd && state.currentBoard && state.lastColumnsBackup) {
+          state.currentBoard.columns = state.lastColumnsBackup;
+          state.lastColumnsBackup = null;
         }
       })
       .addCase(deleteTask.fulfilled, (state, action) => {

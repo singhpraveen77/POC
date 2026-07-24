@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 
 export default function ProfileAvatar({ size = 100 }) {
-  const user = useSelector((store) => store.profile?.profile?.user);
+  const user = useSelector((store) => store.auth?.user);
 
   const name = user?.name;
   const image = user?.profileImage;

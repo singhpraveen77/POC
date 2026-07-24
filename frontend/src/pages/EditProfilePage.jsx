@@ -1,14 +1,30 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 // import MainLoader from "../../components/common/MainLoader";
 // import EditProfileForm from "../../components/Profile/EditProfileForm";
 import MainLoader from "../components/loader/MainLoader";
 import EditProfileForm from "../components/profile/EditProfileForm";
+import { useEffect } from "react";
+import { getProfile } from "../redux/profile/profileThunk";
 
 export default function EditProfilePage() {
+  const dispatch = useDispatch();
+
   const { profile, loading, error } = useSelector(
     (state) => state.profile
   );
+
+  useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      await dispatch(getProfile()).unwrap();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchProfile();
+}, [dispatch]);
 
   if (loading && !profile) {
     return <MainLoader message="Loading Profile..." />;

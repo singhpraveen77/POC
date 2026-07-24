@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchBoardDetails, moveTaskOptimistically, rollbackMoveTask, clearMoveBackup } from '../../redux/board/boardSlice'
+import { fetchBoardDetails, moveTaskOptimistically } from '../../redux/board/boardSlice'
 import { createColumn } from '../../redux/column/columnSlice'
 import { createTask, updateTask, deleteTask } from '../../redux/task/taskSlice'
 import toast from 'react-hot-toast'
@@ -100,7 +100,7 @@ export default function KanbanBoard() {
             clearTimeout(moveTimers.current[taskId]);
         }
 
-        // Schedule API
+        // Schedule API — isDnd:true tells the reducer to skip column re-placement on success
         moveTimers.current[taskId] = setTimeout(() => {
 
         dispatch(
@@ -108,16 +108,14 @@ export default function KanbanBoard() {
                 id: taskId,
                 data: {
                     columnId: toColumnId,
+                    isDnd: true,
                 },
             })
         )
         .unwrap()
-        .then(() => {
-            dispatch(clearMoveBackup());
-        })
         .catch((err) => {
             toast.error(err || "Failed to move task");
-            dispatch(rollbackMoveTask());
+            // Rollback is handled by updateTask.rejected in boardSlice
         });
 
         delete moveTimers.current[taskId];

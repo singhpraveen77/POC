@@ -9,6 +9,7 @@ import {
   sendVerificationCode,
   verifyEmail,
 } from "./authThunk";
+import { uploadProfileImage } from "../profile/profileThunk";
 
 const initialState = {
   user: null,
@@ -113,6 +114,19 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = null;
         state.isAuthenticated = false;
+      })
+      .addCase(uploadProfileImage.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(uploadProfileImage.fulfilled, (state, action) => {
+        state.loading = false;
+        
+        state.user.profileImage = action.payload.profileImage;
+      })
+      .addCase(uploadProfileImage.rejected, (state) => {
+        state.loading = false;
+        state.user.profileImage = null;
+
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
