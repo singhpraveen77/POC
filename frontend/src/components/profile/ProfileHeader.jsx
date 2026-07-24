@@ -5,7 +5,7 @@ export default function ProfileHeader({ user }) {
 
     const navigate=useNavigate();
     const  handleEditProfile=()=>{
-        navigate('editProfilePage')
+        navigate('/editProfilePage')
     }
   const joinedDate = new Date(user.createdAt).toLocaleDateString("en-IN", {
     day: "numeric",

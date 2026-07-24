@@ -5,7 +5,7 @@ export default function WorkspaceCard({ workspace }) {
 
   return (
     <div
-      onClick={() => navigate(`/workspace/${workspace.id}`)}
+      onClick={() => navigate(`/workspaces/${workspace.id}`)}
       style={{
         padding: 16,
         border: "1px solid #e5e7eb",
@@ -28,7 +28,7 @@ export default function WorkspaceCard({ workspace }) {
           color: "#111827",
         }}
       >
-        📁 {workspace.name}
+        -> {workspace.name}
       </div>
 
       <div

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchBoardDetails, moveTaskOptimistically, rollbackMoveTask, clearMoveBackup } from '../../redux/board/boardSlice'
@@ -21,6 +21,7 @@ import { extractFieldErrors } from '../../utils/errorHelper'
 import TaskOptionsLoader from '../loader/TaskOptionsLoader'
 
 export default function KanbanBoard() {
+  const moveTimers = useRef({});
   const { boardId } = useParams()
   const dispatch = useDispatch()
   const { currentBoard, status } = useSelector(state => state.boards)
@@ -89,20 +90,39 @@ export default function KanbanBoard() {
 
     if (!toColumnId) return;
 
-    if (fromColumnId !== toColumnId) {
-      dispatch(moveTaskOptimistically({ taskId: activeTask.id, fromColumnId, toColumnId }));
+      if (fromColumnId !== toColumnId) {
+        dispatch(moveTaskOptimistically({ taskId: activeTask.id, fromColumnId, toColumnId }));
 
-      dispatch(updateTask({
-        id: activeTask.id,
-        data: { columnId: toColumnId }
-      })).unwrap()
+        const taskId = activeTask.id;
+
+        // Cancel previous timer
+        if (moveTimers.current[taskId]) {
+            clearTimeout(moveTimers.current[taskId]);
+        }
+
+        // Schedule API
+        moveTimers.current[taskId] = setTimeout(() => {
+
+        dispatch(
+            updateTask({
+                id: taskId,
+                data: {
+                    columnId: toColumnId,
+                },
+            })
+        )
+        .unwrap()
         .then(() => {
-          dispatch(clearMoveBackup());
+            dispatch(clearMoveBackup());
         })
         .catch((err) => {
-          toast.error(err || "Failed to move task. Reverting.");
-          dispatch(rollbackMoveTask());
+            toast.error(err || "Failed to move task");
+            dispatch(rollbackMoveTask());
         });
+
+        delete moveTimers.current[taskId];
+
+        }, 2000);
     }
   }
 

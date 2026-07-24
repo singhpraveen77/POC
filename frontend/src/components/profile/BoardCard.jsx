@@ -14,7 +14,7 @@ export default function BoardCard({ board }) {
 
   return (
     <div
-      onClick={() => navigate(`/board/${board.id}`)}
+      onClick={() => navigate(`/boards/${board.id}`)}
       style={{
         padding: 16,
         border: "1px solid #e5e7eb",
@@ -37,7 +37,7 @@ export default function BoardCard({ board }) {
           color: "#111827",
         }}
       >
-        📋 {board.name}
+        > {board.name}
       </div>
 
       <div

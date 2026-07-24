@@ -101,7 +101,7 @@ export default function ProfileCard() {
         My Profile
       </button>
 
-      <button
+      {/* <button
         style={{
           width: "100%",
           padding: 10,
@@ -112,7 +112,7 @@ export default function ProfileCard() {
         }}
       >
         Settings
-      </button>
+      </button> */}
 
       <button
         onClick={handleLogout}
