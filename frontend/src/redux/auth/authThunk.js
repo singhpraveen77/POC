@@ -124,3 +124,39 @@ export const logoutUser = createAsyncThunk(
     }
   }
 );
+
+export const forgotPassword = createAsyncThunk(
+  "auth/forgotPassword",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.post("/auth/forgot-password", data);
+      return { message: res.data.message, email: data.email };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to send reset email");
+    }
+  }
+);
+
+export const verifyResetOtp = createAsyncThunk(
+  "auth/verifyResetOtp",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.post("/auth/verify-reset-otp", data);
+      return { message: res.data.message, email: data.email, otp: data.otp };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "OTP verification failed");
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.post("/auth/reset-password", data);
+      return { message: res.data.message };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Password reset failed");
+    }
+  }
+);

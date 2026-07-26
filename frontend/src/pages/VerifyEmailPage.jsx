@@ -11,147 +11,57 @@ import toast from "react-hot-toast";
 export default function VerifyEmailPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const { loading, error } = useSelector((state) => state.auth);
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
 
   useEffect(() => {
     dispatch(clearError());
-    return () => {
-      dispatch(clearError());
-    };
+    return () => { dispatch(clearError()); };
   }, [dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setEmailError("");
-    
-    if (!email.trim()) {
-      setEmailError("Email is required");
-      return;
-    }
+    if (!email.trim()) { setEmailError("Email is required"); return; }
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(email.trim())) {
-      setEmailError("Enter a valid email address");
-      return;
-    }
-
+    if (!emailPattern.test(email.trim())) { setEmailError("Enter a valid email address"); return; }
     try {
-      await dispatch(
-        sendVerificationCode({
-          email: email.trim(),
-        })
-      ).unwrap();
-
+      await dispatch(sendVerificationCode({ email: email.trim() })).unwrap();
       toast.success("Verification code sent successfully!");
       navigate("/verify-email/code", { state: { email: email.trim() } });
     } catch (err) {
-      console.error(err);
       const fields = extractFieldErrors(err);
-      if (fields.email) {
-        setEmailError(fields.email);
-      } else {
-        setEmailError(typeof err === "string" ? err : "Failed to send verification code");
-      }
+      if (fields.email) { setEmailError(fields.email); }
+      else { setEmailError(typeof err === "string" ? err : "Failed to send verification code"); }
     }
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        width: "100%",
-        backgroundColor: "var(--color-background)",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "24px",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "420px",
-          padding: "40px",
-          backgroundColor: "var(--color-surface)",
-          border: "1px solid var(--color-outline-variant)",
-          borderRadius: "8px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-        }}
-      >
-        <div style={{ marginBottom: "24px", textAlign: "center" }}>
-          
-          <h2
-            style={{
-              fontSize: "26px",
-              fontWeight: "800",
-              margin: "0 0 8px 0",
-              color: "var(--color-on-surface)",
-            }}
-          >
-            Verify Email
-          </h2>
-          <p
-            style={{
-              fontSize: "14px",
-              color: "var(--color-on-surface-variant)",
-              margin: 0,
-            }}
-          >
+    <div className="min-h-screen w-full flex justify-center items-center bg-[var(--color-background)] p-6">
+      <div className="w-full max-w-[420px] bg-[var(--color-surface)] border border-[var(--color-outline-variant)] rounded-lg p-10 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+        <div className="text-center mb-6">
+          <h2 className="text-[26px] font-extrabold m-0 mb-2 text-[var(--color-on-surface)]">Verify Email</h2>
+          <p className="text-sm text-[var(--color-on-surface-variant)] m-0">
             Enter your email to receive a 6-digit verification code.
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-          noValidate
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
           <AuthInput
-            id="email"
-            label="Email Address"
-            type="email"
-            placeholder="name@example.com"
-            value={email}
-            error={emailError || error}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setEmailError("");
-              dispatch(clearError());
-            }}
+            id="email" label="Email Address" type="email" placeholder="name@example.com"
+            value={email} error={emailError || error}
+            onChange={(e) => { setEmail(e.target.value); setEmailError(""); dispatch(clearError()); }}
             autoFocus
           />
-
-          <Button
-            type="submit"
-            variant="solid"
-            style={{ height: "42px", marginTop: "12px", justifyContent: "center", fontWeight: 700 }}
-            loading={loading}
-          >
+          <Button type="submit" variant="solid" className="h-[42px] mt-3 justify-center font-bold" loading={loading}>
             Send Verification Code
           </Button>
         </form>
 
-        <p
-          style={{
-            marginTop: "24px",
-            textAlign: "center",
-            fontSize: "14px",
-            color: "var(--color-on-surface-variant)",
-          }}
-        >
+        <p className="mt-6 text-center text-sm text-[var(--color-on-surface-variant)]">
           Back to{" "}
-          <Link
-            to="/login"
-            style={{
-              fontWeight: "700",
-              color: "var(--color-primary)",
-              textDecoration: "none",
-            }}
-          >
-            Sign In
-          </Link>
+          <Link to="/login" className="font-bold text-[var(--color-primary)] no-underline">Sign In</Link>
         </p>
       </div>
     </div>

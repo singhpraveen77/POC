@@ -7,6 +7,10 @@ import Modal from "../components/common/Modal";
 import { extractFieldErrors } from "../utils/errorHelper";
 import toast from "react-hot-toast";
 import { BoardSkeleton } from "../components/loader/BoardLoader";
+import { fetchMembers } from '../redux/member/workspaceMemberSlice'
+import MemberAvatarGroup from '../components/collaboration/MemberAvatarGroup'
+import InviteMemberModal from '../components/collaboration/InviteMemberModal'
+import { validateBoard, hasErrors } from '../utils/validators'
 
 
 
@@ -15,6 +19,10 @@ export default function BoardList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items, status } = useSelector((state) => state.boards);
+  const { members } = useSelector((state) => state.workspaceMembers)
+  const currentUser = useSelector((state) => state.auth.user)
+  const currentUserRole = members.find((m) => m.userId === currentUser?.id)?.role
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [name, setName] = useState("");
@@ -32,8 +40,19 @@ export default function BoardList() {
     dispatch(fetchBoards(workspaceId));
   }, [workspaceId, dispatch]);
 
+  useEffect(() => {
+    dispatch(fetchMembers(workspaceId))
+  }, [workspaceId, dispatch])
+
+  const handleRefresh = () => {
+    dispatch(fetchBoards(workspaceId))
+    dispatch(fetchMembers(workspaceId))
+  }
+
   const handleCreate = (e) => {
     e.preventDefault();
+    const clientErrors = validateBoard({ name });
+    if (hasErrors(clientErrors)) { setCreateErrors(clientErrors); return; }
     setCreateErrors({});
     setIsSubmittingCreate(true);
 
@@ -63,6 +82,8 @@ export default function BoardList() {
 
   const handleUpdate = (e) => {
     e.preventDefault();
+    const clientErrors = validateBoard({ name: editName });
+    if (hasErrors(clientErrors)) { setEditErrors(clientErrors); return; }
     setEditErrors({});
     setIsSubmittingEdit(true);
 
@@ -90,110 +111,84 @@ export default function BoardList() {
   };
 
   return (
-    <div style={{ padding: "40px 24px", maxWidth: 1000, margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+    <div className="px-6 py-10 max-w-[1000px] mx-auto">
+      <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-display-md" style={{ color: "var(--color-on-surface)", margin: 0, fontWeight: 800 }}>Boards</h1>
-          <p style={{ color: "var(--color-on-surface-variant)", margin: "4px 0 0 0", fontSize: 14 }}>Manage your workflows, tasks, and column groupings.</p>
+          <h1 className="text-display-md text-[var(--color-on-surface)] m-0 font-extrabold">Boards</h1>
+          <p className="text-[var(--color-on-surface-variant)] mt-1 mb-0 text-sm">Manage your workflows, tasks, and column groupings.</p>
         </div>
-        <Button variant="solid" onClick={() => setIsCreateOpen(true)} icon="add">Create Board</Button>
+        <div className="flex items-center gap-3">
+          <MemberAvatarGroup members={members} />
+          <Button variant="outline" size="sm" onClick={handleRefresh} icon="refresh">
+            Refresh
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => navigate(`/workspaces/${workspaceId}/members`)} icon="group">
+            Members
+          </Button>
+          {(currentUserRole === "OWNER" || currentUserRole === "ADMIN") && (
+            <Button variant="outline" onClick={() => setIsInviteModalOpen(true)} icon="person_add">
+              Invite
+            </Button>
+          )}
+          <Button variant="solid" onClick={() => setIsCreateOpen(true)} icon="add">Create Board</Button>
+        </div>
       </div>
 
-      {status === "loading" && items.length === 0 ? (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-          gap: 20
-        }}>
+      {status === "loading" ? (
+        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
+          <BoardSkeleton />
+          <BoardSkeleton />
+          <BoardSkeleton />
           <BoardSkeleton />
           <BoardSkeleton />
           <BoardSkeleton />
         </div>
       ) : (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-          gap: 20
-        }}>
+        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
           {items.map((board) => (
             <div
               key={board.id}
               onClick={() => navigate(`/boards/${board.id}`)}
-              style={{
-                padding: 24,
-                backgroundColor: "var(--color-surface)",
-                border: "1px solid var(--color-outline-variant)",
-                borderRadius: "8px",
-                cursor: "pointer",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                transition: "all 0.2s ease",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
-              }}
-              className="hover:shadow-md hover:border-gray-300"
+              className="p-6 bg-[var(--color-surface)] border border-[var(--color-outline-variant)] rounded-lg cursor-pointer flex justify-between items-start transition-all duration-200 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-gray-300"
             >
-              <div style={{ flex: 1, minWidth: 0, paddingRight: 16 }}>
-                <h2 style={{ fontSize: 17, fontWeight: 700, margin: "0 0 6px 0", color: "var(--color-on-surface)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div className="flex-1 min-w-0 pr-4">
+                <h2 className="text-[17px] font-bold mt-0 mb-1.5 text-[var(--color-on-surface)] overflow-hidden text-ellipsis whitespace-nowrap">
                   {board.name}
                 </h2>
-                <p style={{ fontSize: 13, color: "var(--color-on-surface-variant)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <p className="text-[13px] text-[var(--color-on-surface-variant)] m-0 overflow-hidden text-ellipsis whitespace-nowrap">
                   {board.description || "No description"}
                 </p>
               </div>
 
-              {/* Action Buttons */}
-              <div style={{ display: "flex", gap: 4 }} className="flex-shrink-0">
+              {/* Action Buttons — only OWNER/ADMIN */}
+              {(currentUserRole === "OWNER" || currentUserRole === "ADMIN") && (
+              <div className="flex gap-1 flex-shrink-0">
                 <button
                   type="button"
                   onClick={(e) => handleEditClick(board, e)}
-                  style={{
-                    border: "none",
-                    background: "none",
-                    cursor: "pointer",
-                    padding: 4,
-                    display: "flex",
-                    borderRadius: 4,
-                    color: "var(--color-on-surface-variant)"
-                  }}
-                  className="hover:bg-slate-100 hover:text-orange-600"
+                  className="border-none bg-transparent cursor-pointer p-1 flex rounded text-[var(--color-on-surface-variant)] hover:bg-slate-100 hover:text-orange-600"
                   title="Edit Board"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>edit</span>
+                  <span className="material-symbols-outlined text-[18px]">edit</span>
                 </button>
                 <button
                   type="button"
                   onClick={(e) => handleDeleteClick(board, e)}
-                  style={{
-                    border: "none",
-                    background: "none",
-                    cursor: "pointer",
-                    padding: 4,
-                    display: "flex",
-                    borderRadius: 4,
-                    color: "var(--color-on-surface-variant)"
-                  }}
-                  className="hover:bg-red-50 hover:text-red-600"
+                  className="border-none bg-transparent cursor-pointer p-1 flex rounded text-[var(--color-on-surface-variant)] hover:bg-red-50 hover:text-red-600"
                   title="Delete Board"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>delete</span>
+                  <span className="material-symbols-outlined text-[18px]">delete</span>
                 </button>
               </div>
+              )}
             </div>
           ))}
 
           {items.length === 0 && (
-            <div style={{
-              gridColumn: "1 / -1",
-              padding: "48px 24px",
-              textAlign: "center",
-              border: "2px dashed var(--color-outline-variant)",
-              borderRadius: 8,
-              color: "var(--color-on-surface-variant)"
-            }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 48, color: "var(--color-outline)", marginBottom: 12 }}>view_week</span>
-              <p style={{ fontSize: 16, fontWeight: 600, margin: "0 0 4px 0" }}>No boards found</p>
-              <p style={{ fontSize: 14, margin: "0 0 16px 0", color: "var(--color-on-surface-variant)" }}>Get started by creating your first board inside this workspace.</p>
+            <div className="col-span-full py-12 px-6 text-center border-2 border-dashed border-[var(--color-outline-variant)] rounded-lg text-[var(--color-on-surface-variant)]">
+              <span className="material-symbols-outlined text-[48px] text-[var(--color-outline)] mb-3 block">view_week</span>
+              <p className="text-base font-semibold mt-0 mb-1">No boards found</p>
+              <p className="text-sm mt-0 mb-4 text-[var(--color-on-surface-variant)]">Get started by creating your first board inside this workspace.</p>
               <Button variant="solid" onClick={() => setIsCreateOpen(true)} icon="add">Create Board</Button>
             </div>
           )}
@@ -202,51 +197,36 @@ export default function BoardList() {
 
       {/* Create Modal */}
       <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create Board">
-        <form onSubmit={handleCreate} style={{ padding: 24, display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Board Name *</label>
+        <form onSubmit={handleCreate} className="p-6 flex flex-col gap-5">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Board Name *</label>
             <input 
               required 
               placeholder="e.g. Sprint Backlog" 
               value={name} 
               onChange={e => setName(e.target.value)} 
-              style={{
-                padding: "10px 12px",
-                border: "1px solid var(--color-outline)",
-                borderRadius: 6,
-                fontSize: 14,
-                outline: "none"
-              }}
-              className="focus:border-orange-500"
+              className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-sm outline-none focus:border-orange-500"
             />
             {createErrors.name && (
-              <span style={{ fontSize: 12, color: "var(--color-error)", fontWeight: 500 }}>{createErrors.name}</span>
+              <span className="text-xs text-[var(--color-error)] font-medium">{createErrors.name}</span>
             )}
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Description</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Description</label>
             <textarea 
               placeholder="e.g. Tracking sprint tasks and progress." 
               value={description} 
               onChange={e => setDescription(e.target.value)}
               rows={3}
-              style={{
-                padding: "10px 12px",
-                border: "1px solid var(--color-outline)",
-                borderRadius: 6,
-                fontSize: 14,
-                outline: "none",
-                resize: "vertical"
-              }}
-              className="focus:border-orange-500"
+              className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-sm outline-none resize-y focus:border-orange-500"
             />
             {createErrors.description && (
-              <span style={{ fontSize: 12, color: "var(--color-error)", fontWeight: 500 }}>{createErrors.description}</span>
+              <span className="text-xs text-[var(--color-error)] font-medium">{createErrors.description}</span>
             )}
           </div>
 
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 8 }}>
+          <div className="flex justify-end gap-3 mt-2">
             <Button variant="outline" onClick={() => setIsCreateOpen(false)} type="button">Cancel</Button>
             <Button variant="solid" type="submit" loading={isSubmittingCreate}>Create</Button>
           </div>
@@ -255,56 +235,47 @@ export default function BoardList() {
 
       {/* Edit Modal */}
       <Modal isOpen={!!editingBoard} onClose={() => setEditingBoard(null)} title="Edit Board">
-        <form onSubmit={handleUpdate} style={{ padding: 24, display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Board Name *</label>
+        <form onSubmit={handleUpdate} className="p-6 flex flex-col gap-5">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Board Name *</label>
             <input 
               required 
               placeholder="e.g. Sprint Backlog" 
               value={editName} 
               onChange={e => setEditName(e.target.value)} 
-              style={{
-                padding: "10px 12px",
-                border: "1px solid var(--color-outline)",
-                borderRadius: 6,
-                fontSize: 14,
-                outline: "none"
-              }}
-              className="focus:border-orange-500"
+              className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-sm outline-none focus:border-orange-500"
             />
             {editErrors.name && (
-              <span style={{ fontSize: 12, color: "var(--color-error)", fontWeight: 500 }}>{editErrors.name}</span>
+              <span className="text-xs text-[var(--color-error)] font-medium">{editErrors.name}</span>
             )}
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Description</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Description</label>
             <textarea 
               placeholder="e.g. Tracking sprint tasks and progress." 
               value={editDescription} 
               onChange={e => setEditDescription(e.target.value)}
               rows={3}
-              style={{
-                padding: "10px 12px",
-                border: "1px solid var(--color-outline)",
-                borderRadius: 6,
-                fontSize: 14,
-                outline: "none",
-                resize: "vertical"
-              }}
-              className="focus:border-orange-500"
+              className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-sm outline-none resize-y focus:border-orange-500"
             />
             {editErrors.description && (
-              <span style={{ fontSize: 12, color: "var(--color-error)", fontWeight: 500 }}>{editErrors.description}</span>
+              <span className="text-xs text-[var(--color-error)] font-medium">{editErrors.description}</span>
             )}
           </div>
 
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 8 }}>
+          <div className="flex justify-end gap-3 mt-2">
             <Button variant="outline" onClick={() => setEditingBoard(null)} type="button">Cancel</Button>
             <Button variant="solid" type="submit" loading={isSubmittingEdit}>Save Changes</Button>
           </div>
         </form>
       </Modal>
+
+      <InviteMemberModal
+        workspaceId={workspaceId}
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+      />
     </div>
   );
 }

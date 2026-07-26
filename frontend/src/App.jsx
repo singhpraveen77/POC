@@ -18,6 +18,11 @@ import VerifyEmailPage from './pages/VerifyEmailPage'
 import VerifyEmailCodePage from './pages/VerifyEmailCodePage'
 import ProfilePage from './pages/ProfilePage'
 import EditProfilePage from './pages/EditProfilePage'
+import WorkspaceMembersPage from './pages/WorkspaceMembersPage'
+import InvitationsPage from './pages/InvitationsPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetOtpPage from './pages/ResetOtpPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 
 export default function App() {
   const dispatch = useDispatch();
@@ -69,6 +74,9 @@ export default function App() {
               </RedirectIfAuth>
             }
           />
+          <Route path="/forgot-password" element={<RedirectIfAuth><ForgotPasswordPage /></RedirectIfAuth>} />
+          <Route path="/reset-password/verify-otp" element={<ResetOtpPage />} />
+          <Route path="/reset-password/new" element={<ResetPasswordPage />} />
 
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
@@ -77,6 +85,8 @@ export default function App() {
               <Route path="/boards/:boardId" element={<KanbanBoard />} />
               <Route path="/profilePage" element={<ProfilePage />} />
               <Route path="/editProfilePage" element={<EditProfilePage />} />
+              <Route path="/workspaces/:workspaceId/members" element={<WorkspaceMembersPage />} />
+              <Route path="/invitations" element={<InvitationsPage />} />
             </Route>
           </Route>
 

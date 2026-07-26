@@ -3,39 +3,14 @@ import EmptyState from "./EmptyState";
 
 export default function RecentWorkspaces({ workspaces }) {
   return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: 12,
-        border: "1px solid #e5e7eb",
-        padding: 20,
-      }}
-    >
-      <h3
-        style={{
-          margin: 0,
-          marginBottom: 20,
-          fontSize: 20,
-        }}
-      >
-        Recent Workspaces
-      </h3>
-
+    <div className="bg-white rounded-xl border border-gray-200 p-5">
+      <h3 className="m-0 mb-5 text-xl">Recent Workspaces</h3>
       {workspaces.length === 0 ? (
         <EmptyState message="No recent workspaces found." />
       ) : (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 14,
-          }}
-        >
+        <div className="flex flex-col gap-3.5">
           {workspaces.map((workspace) => (
-            <WorkspaceCard
-              key={workspace.id}
-              workspace={workspace}
-            />
+            <WorkspaceCard key={workspace.id} workspace={workspace} />
           ))}
         </div>
       )}

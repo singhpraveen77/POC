@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchBoardDetails, moveTaskOptimistically } from '../../redux/board/boardSlice'
 import { createColumn } from '../../redux/column/columnSlice'
 import { createTask, updateTask, deleteTask } from '../../redux/task/taskSlice'
+import { fetchMembers } from '../../redux/member/workspaceMemberSlice'
 import toast from 'react-hot-toast'
 import { TailSpin } from 'react-loader-spinner'
 import {
@@ -19,12 +20,16 @@ import Button from '../common/Button'
 import Modal from '../common/Modal'
 import { extractFieldErrors } from '../../utils/errorHelper'
 import TaskOptionsLoader from '../loader/TaskOptionsLoader'
+import { validateColumn, validateTask, hasErrors } from '../../utils/validators'
 
 export default function KanbanBoard() {
   const moveTimers = useRef({});
   const { boardId } = useParams()
   const dispatch = useDispatch()
   const { currentBoard, status } = useSelector(state => state.boards)
+  const { members } = useSelector(state => state.workspaceMembers)
+  const currentUser = useSelector(state => state.auth.user)
+  const currentUserRole = members.find(m => m.userId === currentUser?.id)?.role
   
   const [activeId, setActiveId] = useState(null)
   
@@ -36,6 +41,7 @@ export default function KanbanBoard() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false)
   const [taskTitle, setTaskTitle] = useState("")
   const [taskColumnId, setTaskColumnId] = useState(null)
+  const [taskAssigneeId, setTaskAssigneeId] = useState("")
   const [taskErrors, setTaskErrors] = useState({})
   const [isSubmittingTask, setIsSubmittingTask] = useState(false)
 
@@ -43,6 +49,7 @@ export default function KanbanBoard() {
   const [editTaskTitle, setEditTaskTitle] = useState("")
   const [editTaskDescription, setEditTaskDescription] = useState("")
   const [editTaskStatus, setEditTaskStatus] = useState("")
+  const [editTaskAssigneeId, setEditTaskAssigneeId] = useState("")
   const [editTaskErrors, setEditTaskErrors] = useState({})
   const [isSavingEditTask, setIsSavingEditTask] = useState(false)
   const [isDeletingTask, setIsDeletingTask] = useState(false)
@@ -51,6 +58,16 @@ export default function KanbanBoard() {
   useEffect(() => {
     dispatch(fetchBoardDetails(boardId))
   }, [boardId, dispatch])
+
+  const handleRefresh = () => {
+    dispatch(fetchBoardDetails(boardId))
+  }
+
+  useEffect(() => {
+    if (currentBoard?.workspaceId) {
+      dispatch(fetchMembers(currentBoard.workspaceId))
+    }
+  }, [currentBoard?.workspaceId, dispatch])
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
@@ -126,6 +143,8 @@ export default function KanbanBoard() {
 
   const handleCreateColumn = (e) => {
     e.preventDefault()
+    const clientErrors = validateColumn({ name: columnName })
+    if (hasErrors(clientErrors)) { setColumnErrors(clientErrors); return; }
     setColumnErrors({})
     setIsSubmittingColumn(true)
 
@@ -146,15 +165,18 @@ export default function KanbanBoard() {
 
   const handleCreateTask = (e) => {
     e.preventDefault()
+    const clientErrors = validateTask({ title: taskTitle })
+    if (hasErrors(clientErrors)) { setTaskErrors(clientErrors); return; }
     setTaskErrors({})
     setIsSubmittingTask(true)
 
-    dispatch(createTask({ title: taskTitle, columnId: taskColumnId }))
+    dispatch(createTask({ title: taskTitle, columnId: taskColumnId, assigneeId: taskAssigneeId || undefined }))
       .unwrap()
       .then(() => {
         setIsTaskModalOpen(false)
         setTaskTitle("")
         setTaskColumnId(null)
+        setTaskAssigneeId("")
       })
       .catch((err) => {
         const fields = extractFieldErrors(err)
@@ -172,12 +194,15 @@ export default function KanbanBoard() {
       setEditTaskTitle(task.title)
       setEditTaskDescription(task.description || "")
       setEditTaskStatus(task.status || "TODO")
+      setEditTaskAssigneeId(task.assigneeId || "")
       setEditTaskErrors({})
     }
   }
 
   const handleUpdateTask = (e) => {
     e.preventDefault()
+    const clientErrors = validateTask({ title: editTaskTitle })
+    if (hasErrors(clientErrors)) { setEditTaskErrors(clientErrors); return; }
     setEditTaskErrors({})
     setIsSavingEditTask(true)
     setIsDeletingTask(false)
@@ -195,6 +220,9 @@ export default function KanbanBoard() {
     
     if (targetColumn) {
       updateData.columnId = targetColumn.id;
+    }
+    if (editTaskAssigneeId) {
+      updateData.assigneeId = editTaskAssigneeId;
     }
 
     dispatch(updateTask({ id: editingTask.id, data: updateData }))
@@ -229,18 +257,18 @@ export default function KanbanBoard() {
 
   if (status === 'loading' && !currentBoard) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: 16 }}>
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
         <TailSpin height="50" width="50" color="var(--color-primary)" ariaLabel="loading" />
-        <span style={{ fontSize: 14, color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>Loading board details...</span>
+        <span className="text-[14px] text-[var(--color-on-surface-variant)] font-semibold">Loading board details...</span>
       </div>
     )
   }
 
   if (!currentBoard) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: 12 }}>
-        <span className="material-symbols-outlined" style={{ fontSize: 48, color: 'var(--color-outline)' }}>error</span>
-        <span style={{ fontSize: 15, color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>Board not found</span>
+      <div className="flex flex-col items-center justify-center h-screen gap-3">
+        <span className="material-symbols-outlined text-[48px] text-[var(--color-outline)]">error</span>
+        <span className="text-[15px] text-[var(--color-on-surface-variant)] font-semibold">Board not found</span>
       </div>
     )
   }
@@ -253,9 +281,16 @@ export default function KanbanBoard() {
           <h1 className="text-xl font-extrabold text-[var(--color-on-surface)] m-0">{currentBoard.name}</h1>
           <p className="text-[12.5px] text-[var(--color-on-surface-variant)] font-semibold">{currentBoard.columns?.length || 0} columns in board</p>
         </div>
-        <Button variant="solid" onClick={() => setIsColumnModalOpen(true)} icon="add">
-          Add Column
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={handleRefresh} icon="refresh" size="sm">
+            Refresh
+          </Button>
+          {currentUserRole !== 'VIEWER' && (
+            <Button variant="solid" onClick={() => setIsColumnModalOpen(true)} icon="add">
+              Add Column
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Board Columns Grid */}
@@ -274,7 +309,7 @@ export default function KanbanBoard() {
                 <button
                   type="button"
                   onClick={() => { setTaskColumnId(col.id); setIsTaskModalOpen(true); }}
-                  className="mt-3 w-full text-xs font-semibold py-2.5 text-center text-orange-600 hover:bg-orange-50 border border-dashed border-orange-200 rounded-lg cursor-pointer transition-colors"
+                  className={`mt-3 w-full text-xs font-semibold py-2.5 text-center text-orange-600 hover:bg-orange-50 border border-dashed border-orange-200 rounded-lg cursor-pointer transition-colors${currentUserRole === 'VIEWER' ? ' hidden' : ''}`}
                 >
                   + Add Task Card
                 </button>
@@ -285,7 +320,7 @@ export default function KanbanBoard() {
 
         <DragOverlay zIndex={100} dropAnimation={null}>
           {activeTask ? (
-            <div className="w-[280px] shadow-2xl opacity-90 scale-[1.02] transform-none" style={{ touchAction: 'none' }}>
+            <div className="w-[280px] shadow-2xl opacity-90 scale-[1.02] transform-none touch-none">
               <TaskCard task={activeTask} isDone={activeTask.status === 'DONE'} onClick={() => {}} />
             </div>
           ) : null}
@@ -294,29 +329,22 @@ export default function KanbanBoard() {
 
       {/* Column creation modal */}
       <Modal isOpen={isColumnModalOpen} onClose={() => setIsColumnModalOpen(false)} title="New Column">
-        <form onSubmit={handleCreateColumn} style={{ padding: 24, display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Column Name *</label>
+        <form onSubmit={handleCreateColumn} className="p-6 flex flex-col gap-5">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Column Name *</label>
             <input 
               required 
               placeholder="e.g. In Progress" 
               value={columnName} 
               onChange={e => setColumnName(e.target.value)} 
-              style={{
-                padding: "10px 12px",
-                border: "1px solid var(--color-outline)",
-                borderRadius: 6,
-                fontSize: 14,
-                outline: "none"
-              }}
-              className="focus:border-orange-500"
+              className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-[14px] outline-none focus:border-orange-500"
             />
             {columnErrors.name && (
-              <span style={{ fontSize: 12, color: "var(--color-error)", fontWeight: 500 }}>{columnErrors.name}</span>
+              <span className="text-[12px] text-[var(--color-error)] font-medium">{columnErrors.name}</span>
             )}
           </div>
 
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
+          <div className="flex justify-end gap-3">
             <Button variant="outline" onClick={() => setIsColumnModalOpen(false)} type="button">Cancel</Button>
             <Button variant="solid" type="submit" loading={isSubmittingColumn}>Create</Button>
           </div>
@@ -325,29 +353,38 @@ export default function KanbanBoard() {
 
       {/* Task creation modal */}
       <Modal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} title="New Task Card">
-        <form onSubmit={handleCreateTask} style={{ padding: 24, display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Task Title *</label>
+        <form onSubmit={handleCreateTask} className="p-6 flex flex-col gap-5">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Task Title *</label>
             <input 
               required 
               placeholder="e.g. Implement Oauth login" 
               value={taskTitle} 
               onChange={e => setTaskTitle(e.target.value)} 
-              style={{
-                padding: "10px 12px",
-                border: "1px solid var(--color-outline)",
-                borderRadius: 6,
-                fontSize: 14,
-                outline: "none"
-              }}
-              className="focus:border-orange-500"
+              className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-[14px] outline-none focus:border-orange-500"
             />
             {taskErrors.title && (
-              <span style={{ fontSize: 12, color: "var(--color-error)", fontWeight: 500 }}>{taskErrors.title}</span>
+              <span className="text-[12px] text-[var(--color-error)] font-medium">{taskErrors.title}</span>
             )}
           </div>
 
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
+          {members.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Assignee</label>
+              <select
+                value={taskAssigneeId}
+                onChange={e => setTaskAssigneeId(e.target.value)}
+                className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-[14px] outline-none bg-[var(--color-surface)] focus:border-orange-500"
+              >
+                <option value="">Unassigned</option>
+                {members.map(m => (
+                  <option key={m.userId} value={m.userId}>{m.user.name} (@{m.user.username})</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3">
             <Button variant="outline" onClick={() => setIsTaskModalOpen(false)} type="button">Cancel</Button>
             <Button variant="solid" type="submit" loading={isSubmittingTask}>Create</Button>
           </div>
@@ -359,64 +396,41 @@ export default function KanbanBoard() {
         {isTaskOptionsLoading ? (
           <TaskOptionsLoader/>
         ) : (
-          <form onSubmit={handleUpdateTask} style={{ padding: 24, display: "flex", flexDirection: "column", gap: 20 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Title *</label>
+          <form onSubmit={handleUpdateTask} className="p-6 flex flex-col gap-5">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Title *</label>
               <input 
                 required 
                 placeholder="Task Title" 
                 value={editTaskTitle} 
                 onChange={e => setEditTaskTitle(e.target.value)} 
-                style={{
-                  padding: "10px 12px",
-                  border: "1px solid var(--color-outline)",
-                  borderRadius: 6,
-                  fontSize: 14,
-                  outline: "none"
-                }}
-                className="focus:border-orange-500"
+                className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-[14px] outline-none focus:border-orange-500"
               />
               {editTaskErrors.title && (
-                <span style={{ fontSize: 12, color: "var(--color-error)", fontWeight: 500 }}>{editTaskErrors.title}</span>
+                <span className="text-[12px] text-[var(--color-error)] font-medium">{editTaskErrors.title}</span>
               )}
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Description</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Description</label>
               <textarea 
                 placeholder="Task details and description..." 
                 value={editTaskDescription} 
                 onChange={e => setEditTaskDescription(e.target.value)}
                 rows={4}
-                style={{
-                  padding: "10px 12px",
-                  border: "1px solid var(--color-outline)",
-                  borderRadius: 6,
-                  fontSize: 14,
-                  outline: "none",
-                  resize: "vertical"
-                }}
-                className="focus:border-orange-500"
+                className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-[14px] outline-none resize-y focus:border-orange-500"
               />
               {editTaskErrors.description && (
-                <span style={{ fontSize: 12, color: "var(--color-error)", fontWeight: 500 }}>{editTaskErrors.description}</span>
+                <span className="text-[12px] text-[var(--color-error)] font-medium">{editTaskErrors.description}</span>
               )}
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: "var(--color-on-surface)" }}>Task Segment / Column</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Task Segment / Column</label>
               <select
                 value={editTaskStatus}
                 onChange={e => setEditTaskStatus(e.target.value)}
-                style={{
-                  padding: "10px 12px",
-                  border: "1px solid var(--color-outline)",
-                  borderRadius: 6,
-                  fontSize: 14,
-                  outline: "none",
-                  backgroundColor: "var(--color-surface)"
-                }}
-                className="focus:border-orange-500"
+                className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-[14px] outline-none bg-[var(--color-surface)] focus:border-orange-500"
               >
                 {currentBoard.columns?.map(col => (
                   <option key={col.id} value={col.id}>{col.name}</option>
@@ -424,13 +438,33 @@ export default function KanbanBoard() {
               </select>
             </div>
 
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginTop: 12 }}>
+            {members.length > 0 && (
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Assignee</label>
+                <select
+                  value={editTaskAssigneeId}
+                  onChange={e => setEditTaskAssigneeId(e.target.value)}
+                  className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-[14px] outline-none bg-[var(--color-surface)] focus:border-orange-500"
+                >
+                  <option value="">Unassigned</option>
+                  {members.map(m => (
+                    <option key={m.userId} value={m.userId}>{m.user.name} (@{m.user.username})</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="flex justify-between gap-3 mt-3">
+              {(currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') && (
               <Button variant="danger" onClick={handleDeleteTask} type="button" loading={isDeletingTask} icon="delete" disabled={isTaskOptionsLoading}>
                 Delete Task
               </Button>
-              <div style={{ display: "flex", gap: 12 }}>
+              )}
+              <div className="flex gap-3 ml-auto">
                 <Button variant="outline" onClick={() => setEditingTask(null)} type="button" disabled={isTaskOptionsLoading}>Cancel</Button>
+                {currentUserRole !== 'VIEWER' && (
                 <Button variant="solid" type="submit" loading={isSavingEditTask} disabled={isTaskOptionsLoading}>Save Changes</Button>
+                )}
               </div>
             </div>
           </form>

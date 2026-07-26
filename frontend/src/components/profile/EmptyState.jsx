@@ -1,25 +1,7 @@
 export default function EmptyState({ message }) {
   return (
-    <div
-      style={{
-        padding: "40px 20px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "#6b7280",
-        textAlign: "center",
-      }}
-    >
-
-      <p
-        style={{
-          margin: 0,
-          fontSize: 15,
-        }}
-      >
-        {message}
-      </p>
+    <div className="py-10 px-5 flex flex-col items-center justify-center text-gray-500 text-center">
+      <p className="m-0 text-[15px]">{message}</p>
     </div>
   );
 }

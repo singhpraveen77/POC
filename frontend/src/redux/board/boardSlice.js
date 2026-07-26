@@ -115,11 +115,21 @@ const boardSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchBoards.pending, (state) => {
+        state.status = "loading";
+        state.items = [];
+      })
       .addCase(fetchBoards.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.items = action.payload;
+      })
+      .addCase(fetchBoards.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
       })
       .addCase(fetchBoardDetails.pending, (state) => {
         state.status = "loading";
+        state.currentBoard = null;
       })
       .addCase(fetchBoardDetails.fulfilled, (state, action) => {
         state.status = "succeeded";

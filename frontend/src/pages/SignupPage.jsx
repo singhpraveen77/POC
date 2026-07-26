@@ -125,84 +125,26 @@ const handleSubmit = async (e) => {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: 'var(--color-background)', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-      <div style={{ 
-        width: '100%', 
-        maxWidth: '420px', 
-        padding: '40px', 
-        backgroundColor: 'var(--color-surface)',
-        border: '1px solid var(--color-outline-variant)',
-        borderRadius: '8px',
-        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-      }}>
-        <div style={{ marginBottom: '24px', textAlign: 'center' }}>
-          
-          <h2 style={{ fontSize: '26px', fontWeight: '800', margin: '0 0 8px 0', color: 'var(--color-on-surface)' }}>
-            Create Account
-          </h2>
-          
+    <div className="min-h-screen w-full flex justify-center items-center bg-[var(--color-background)] p-6">
+      <div className="w-full max-w-[420px] bg-[var(--color-surface)] border border-[var(--color-outline-variant)] rounded-lg p-10 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+        <div className="text-center mb-6">
+          <h2 className="text-[26px] font-extrabold m-0 mb-2 text-[var(--color-on-surface)]">Create Account</h2>
         </div>
 
-        <form onSubmit={(e)=>{handleSubmit(e)}} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} noValidate>
-          <AuthInput
-            id="name"
-            label="Full Name"
-            placeholder="praveen singh ..."
-            value={fields.name}
-            onChange={update('name')}
-            error={errors.name}
-            autoFocus
-          />
-          <AuthInput
-            id="username"
-            label="Username"
-            placeholder="praveen123 ..."
-            value={fields.username}
-            onChange={update('username')}
-            error={errors.username}
-          />
-          <AuthInput
-            id="email"
-            label="Email Address"
-            type="email"
-            placeholder="praveen@example.com"
-            value={fields.email}
-            onChange={update('email')}
-            error={errors.email}
-          />
-          <AuthInput
-            id="password"
-            label="Password"
-            type="password"
-            placeholder="••••••••"
-            value={fields.password}
-            onChange={update('password')}
-            error={errors.password}
-          />
-          <AuthInput
-            id="confirmPassword"
-            label="Confirm Password"
-            type="password"
-            placeholder="••••••••"
-            value={fields.confirmPassword}
-            onChange={update('confirmPassword')}
-            error={errors.confirmPassword}
-          />
-
-          <Button
-            type='submit'
-            variant="solid"
-            style={{ height: '42px', marginTop: '12px', justifyContent: 'center', fontWeight: 700 }}
-            loading={loading}
-          >
+        <form onSubmit={(e)=>{handleSubmit(e)}} className="flex flex-col gap-4" noValidate>
+          <AuthInput id="name" label="Full Name" placeholder="praveen singh ..." value={fields.name} onChange={update('name')} error={errors.name} autoFocus />
+          <AuthInput id="username" label="Username" placeholder="praveen123 ..." value={fields.username} onChange={update('username')} error={errors.username} />
+          <AuthInput id="email" label="Email Address" type="email" placeholder="praveen@example.com" value={fields.email} onChange={update('email')} error={errors.email} />
+          <AuthInput id="password" label="Password" type="password" placeholder="••••••••" value={fields.password} onChange={update('password')} error={errors.password} />
+          <AuthInput id="confirmPassword" label="Confirm Password" type="password" placeholder="••••••••" value={fields.confirmPassword} onChange={update('confirmPassword')} error={errors.confirmPassword} />
+          <Button type='submit' variant="solid" className="h-[42px] mt-3 justify-center font-bold" loading={loading}>
             Create Account
           </Button>
         </form>
 
-        <p style={{ marginTop: '24px', textAlign: 'center', fontSize: '14px', color: 'var(--color-on-surface-variant)' }}>
-          Already have an account? <Link to="/login" style={{ fontWeight: '700', color: 'var(--color-primary)', textDecoration: 'none' }}>
-            Sign in here
-          </Link>
+        <p className="mt-6 text-center text-sm text-[var(--color-on-surface-variant)]">
+          Already have an account?{" "}
+          <Link to="/login" className="font-bold text-[var(--color-primary)] no-underline">Sign in here</Link>
         </p>
       </div>
     </div>

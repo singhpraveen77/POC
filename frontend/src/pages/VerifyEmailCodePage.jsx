@@ -11,33 +11,14 @@ export default function VerifyEmailCodePage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
-  // useLocation() is a hook from React Router that gives you information about the current URL/location of your application.
-  // {
-//   pathname: "/dashboard/workspace/123",
-//   search: "?page=2",
-//   hash: "#section1",
-//   state: null,
-//   key: "abc123"
-// }
   const { loading, error } = useSelector((state) => state.auth);
-  
+
   const email = location.state?.email || "";
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [otpError, setOtpError] = useState("");
-  
-  // 60 sec cooldown
   const [cooldown, setCooldown] = useState(0);
-  const inputRefs = [
-    useRef(null),
-    useRef(null),
-    useRef(null),
-    useRef(null),
-    useRef(null),
-    useRef(null),
-  ];
+  const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)];
 
-  // Redirect if no email is present in state
   useEffect(() => {
     if (!email) {
       toast.error("No email provided for verification.");
@@ -47,12 +28,9 @@ export default function VerifyEmailCodePage() {
 
   useEffect(() => {
     dispatch(clearError());
-    return () => {
-      dispatch(clearError());
-    };
+    return () => { dispatch(clearError()); };
   }, [dispatch]);
 
-  // Cooldown countdown timer
   useEffect(() => {
     if (cooldown > 0) {
       const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
@@ -61,30 +39,21 @@ export default function VerifyEmailCodePage() {
   }, [cooldown]);
 
   const handleOtpChange = (value, index) => {
-    // Only allow numbers
     if (value && !/^\d+$/.test(value)) return;
-
     const newOtp = [...otp];
-    // Take only the last character if multiple characters are somehow inputted
     newOtp[index] = value.substring(value.length - 1);
     setOtp(newOtp);
     setOtpError("");
     dispatch(clearError());
-
-    if (value && index < 5) {
-      inputRefs[index + 1].current.focus();
-    }
+    if (value && index < 5) inputRefs[index + 1].current.focus();
   };
 
   const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace") {
-      if (!otp[index] && index > 0) {
-        // Clear previous input and focus it
-        const newOtp = [...otp];
-        newOtp[index - 1] = "";
-        setOtp(newOtp);
-        inputRefs[index - 1].current.focus();
-      }
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      const newOtp = [...otp];
+      newOtp[index - 1] = "";
+      setOtp(newOtp);
+      inputRefs[index - 1].current.focus();
     }
   };
 
@@ -92,113 +61,50 @@ export default function VerifyEmailCodePage() {
     e.preventDefault();
     const pasteData = e.clipboardData.getData("text").trim();
     if (!/^\d{6}$/.test(pasteData)) return;
-
-    const newOtp = pasteData.split("");
-    setOtp(newOtp);
+    setOtp(pasteData.split(""));
     inputRefs[5].current.focus();
   };
 
   const handleVerify = async (e) => {
     e.preventDefault();
     const otpCode = otp.join("");
-    if (otpCode.length !== 6) {
-      setOtpError("Please enter all 6 digits of the OTP code.");
-      return;
-    }
-
+    if (otpCode.length !== 6) { setOtpError("Please enter all 6 digits of the OTP code."); return; }
     try {
-      await dispatch(
-        verifyEmail({
-          email,
-          otp: otpCode,
-        })
-      ).unwrap();
-
+      await dispatch(verifyEmail({ email, otp: otpCode })).unwrap();
       toast.success("Email verified successfully! You can now log in.");
       navigate("/login", { replace: true });
     } catch (err) {
-      console.error(err);
       const fields = extractFieldErrors(err);
-      if (fields.otp) {
-        setOtpError(fields.otp);
-      } else {
-        setOtpError(typeof err === "string" ? err : "Verification failed");
-      }
+      if (fields.otp) { setOtpError(fields.otp); }
+      else { setOtpError(typeof err === "string" ? err : "Verification failed"); }
     }
   };
 
   const handleResend = async () => {
     if (cooldown > 0) return;
-
     try {
-      await dispatch(
-        sendVerificationCode({
-          email,
-        })
-      ).unwrap();
-
+      await dispatch(sendVerificationCode({ email })).unwrap();
       toast.success("A new verification code has been sent to your email.");
       setOtp(["", "", "", "", "", ""]);
-      setCooldown(60); // Trigger 60-second cooldown
+      setCooldown(60);
       if (inputRefs[0].current) inputRefs[0].current.focus();
     } catch (err) {
-      console.error(err);
       toast.error(typeof err === "string" ? err : "Failed to resend code");
     }
   };
 
-  const handleChangeEmail = () => {
-    navigate("/verify-email");
-  };
-
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        width: "100%",
-        backgroundColor: "var(--color-background)",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "24px",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "420px",
-          padding: "40px",
-          backgroundColor: "var(--color-surface)",
-          border: "1px solid var(--color-outline-variant)",
-          borderRadius: "8px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-        }}
-      >
-        <div style={{ marginBottom: "24px", textAlign: "center" }}>
-          
-          <h2
-            style={{
-              fontSize: "24px",
-              fontWeight: "800",
-              margin: "0 0 8px 0",
-              color: "var(--color-on-surface)",
-            }}
-          >
-            Enter Verification Code
-          </h2>
-          <p
-            style={{
-              fontSize: "14px",
-              color: "var(--color-on-surface-variant)",
-              margin: 0,
-            }}
-          >
-            We've sent a 6-digit code to <strong style={{ color: "var(--color-on-surface)" }}>{email}</strong>
+    <div className="min-h-screen w-full flex justify-center items-center bg-[var(--color-background)] p-6">
+      <div className="w-full max-w-[420px] bg-[var(--color-surface)] border border-[var(--color-outline-variant)] rounded-lg p-10 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+        <div className="text-center mb-6">
+          <h2 className="text-[24px] font-extrabold m-0 mb-2 text-[var(--color-on-surface)]">Enter Verification Code</h2>
+          <p className="text-sm text-[var(--color-on-surface-variant)] m-0">
+            We've sent a 6-digit code to <strong className="text-[var(--color-on-surface)]">{email}</strong>
           </p>
         </div>
 
-        <form onSubmit={handleVerify} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: "8px" }} onPaste={handlePaste}>
+        <form onSubmit={handleVerify} className="flex flex-col gap-5">
+          <div className="flex justify-between gap-2" onPaste={handlePaste}>
             {otp.map((digit, idx) => (
               <input
                 key={idx}
@@ -208,68 +114,39 @@ export default function VerifyEmailCodePage() {
                 value={digit}
                 onChange={(e) => handleOtpChange(e.target.value, idx)}
                 onKeyDown={(e) => handleKeyDown(e, idx)}
-                style={{
-                  width: "44px",
-                  height: "46px",
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  border: "1.5px solid",
-                  borderColor: otpError || error ? "var(--color-error)" : "var(--color-outline)",
-                  borderRadius: "6px",
-                  outline: "none",
-                  backgroundColor: "var(--color-surface)",
-                  color: "var(--color-on-surface)",
-                }}
-                className="focus:border-orange-500"
+                className={[
+                  "w-11 h-[46px] text-[20px] font-bold text-center border-[1.5px] rounded-[6px] outline-none bg-[var(--color-surface)] text-[var(--color-on-surface)] focus:border-orange-500",
+                  otpError || error ? "border-[var(--color-error)]" : "border-[var(--color-outline)]"
+                ].join(" ")}
               />
             ))}
           </div>
 
           {(otpError || error) && (
-            <p style={{ fontSize: "13px", color: "var(--color-error)", margin: "0 auto", textAlign: "center", fontWeight: 600 }}>
+            <p className="text-[13px] text-[var(--color-error)] text-center font-semibold m-0">
               {otpError || error}
             </p>
           )}
 
-          <Button
-            type="submit"
-            variant="solid"
-            style={{ height: "42px", marginTop: "12px", justifyContent: "center", fontWeight: 700 }}
-            loading={loading}
-          >
+          <Button type="submit" variant="solid" className="h-[42px] mt-3 justify-center font-bold" loading={loading}>
             Verify Code
           </Button>
         </form>
 
-        <div style={{ marginTop: "24px", display: "flex", justifyContent: "space-between", fontSize: "14px" }}>
+        <div className="mt-6 flex justify-between text-sm">
           <button
             onClick={handleResend}
             disabled={cooldown > 0 || loading}
-            style={{
-              background: "none",
-              border: "none",
-              fontWeight: "700",
-              color: cooldown > 0 ? "var(--color-outline)" : "var(--color-primary)",
-              cursor: cooldown > 0 ? "not-allowed" : "pointer",
-              padding: 0,
-              fontFamily: "inherit",
-            }}
+            className={[
+              "bg-transparent border-0 font-bold p-0 cursor-pointer",
+              cooldown > 0 ? "text-[var(--color-outline)] cursor-not-allowed" : "text-[var(--color-primary)]"
+            ].join(" ")}
           >
             {cooldown > 0 ? `Resend Code (${cooldown}s)` : "Resend Code"}
           </button>
-
           <button
-            onClick={handleChangeEmail}
-            style={{
-              background: "none",
-              border: "none",
-              fontWeight: "700",
-              color: "var(--color-primary)",
-              cursor: "pointer",
-              padding: 0,
-              fontFamily: "inherit",
-            }}
+            onClick={() => navigate("/verify-email")}
+            className="bg-transparent border-0 font-bold text-[var(--color-primary)] cursor-pointer p-0"
           >
             Change Email
           </button>

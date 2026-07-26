@@ -1,7 +1,4 @@
 import { useDispatch, useSelector } from "react-redux";
-
-// import MainLoader from "../../components/common/MainLoader";
-// import EditProfileForm from "../../components/Profile/EditProfileForm";
 import MainLoader from "../components/loader/MainLoader";
 import EditProfileForm from "../components/profile/EditProfileForm";
 import { useEffect } from "react";
@@ -9,71 +6,36 @@ import { getProfile } from "../redux/profile/profileThunk";
 
 export default function EditProfilePage() {
   const dispatch = useDispatch();
-
-  const { profile, loading, error } = useSelector(
-    (state) => state.profile
-  );
+  const { profile, loading, error } = useSelector((state) => state.profile);
 
   useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      await dispatch(getProfile()).unwrap();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    const fetchProfile = async () => {
+      try {
+        await dispatch(getProfile()).unwrap();
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchProfile();
+  }, [dispatch]);
 
-  fetchProfile();
-}, [dispatch]);
-
-  if (loading && !profile) {
-    return <MainLoader message="Loading Profile..." />;
-  }
+  if (loading && !profile) return <MainLoader message="Loading Profile..." />;
 
   if (error) {
     return (
-      <div
-        style={{
-          padding: "2rem",
-          textAlign: "center",
-          color: "red",
-          fontWeight: 600,
-        }}
-      >
-        {error}
-      </div>
+      <div className="p-8 text-center text-red-600 font-semibold">{error}</div>
     );
   }
 
   if (!profile) {
     return (
-      <div
-        style={{
-          padding: "2rem",
-          textAlign: "center",
-          fontWeight: 600,
-        }}
-      >
-        Profile not found.
-      </div>
+      <div className="p-8 text-center font-semibold">Profile not found.</div>
     );
   }
 
   return (
-    <div
-      style={{
-        flex: 1,
-        background: "#f5f6fa",
-        padding: "24px",
-        overflowY: "auto",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "700px",
-          margin: "0 auto",
-        }}
-      >
+    <div className="flex-1 bg-[#f5f6fa] p-6 overflow-y-auto">
+      <div className="max-w-[700px] mx-auto">
         <EditProfileForm user={profile.user} />
       </div>
     </div>

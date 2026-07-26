@@ -3,11 +3,8 @@ import Button from "../common/Button";
 import ProfileAvatar from "./ProfileAvatar";
 
 export default function ProfileHeader({ user }) {
+  const navigate = useNavigate();
 
-    const navigate=useNavigate();
-    const  handleEditProfile=()=>{
-        navigate('/editProfilePage')
-    }
   const joinedDate = new Date(user.createdAt).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
@@ -15,112 +12,29 @@ export default function ProfileHeader({ user }) {
   });
 
   return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: 12,
-        padding: 24,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 24,
-        border: "1px solid #e5e7eb",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 20,
-        }}
-      >
-        <div
-          style={{
-            width: 80,
-            height: 80,
-            borderRadius: "50%",
-            background: "lightgrey",
-            color: "#fff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 30,
-            fontWeight: 700,
-          }}
-        >
-          <ProfileAvatar size={80}/>
+    <div className="bg-white rounded-xl p-6 flex items-center justify-between gap-6 border border-gray-200">
+      <div className="flex items-center gap-5">
+        <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-[30px] font-bold text-white">
+          <ProfileAvatar size={80} />
         </div>
 
         <div>
-          <h2
-            style={{
-              margin: 0,
-              fontSize: 26,
-              fontWeight: 700,
-            }}
-          >
-            {user.name}
-          </h2>
+          <h2 className="m-0 text-[26px] font-bold">{user.name}</h2>
+          <p className="my-1.5 text-gray-500">@{user.username}</p>
+          <p className="my-1.5 text-gray-500">{user.email}</p>
 
-          <p
-            style={{
-              margin: "6px 0",
-              color: "#6b7280",
-            }}
-          >
-            @{user.username}
-          </p>
-
-          <p
-            style={{
-              margin: "6px 0",
-              color: "#6b7280",
-            }}
-          >
-            {user.email}
-          </p>
-
-          <div
-            style={{
-              display: "flex",
-              gap: 10,
-              marginTop: 10,
-              alignItems: "center",
-            }}
-          >
-            <span
-              style={{
-                padding: "4px 10px",
-                borderRadius: 20,
-                fontSize: 13,
-                fontWeight: 600,
-                color: user.isVerified
-                  ? "#15803d"
-                  : "#dc2626",
-              }}
-            >
+          <div className="flex gap-2.5 mt-2.5 items-center">
+            <span className={`px-2.5 py-1 rounded-full text-[13px] font-semibold ${user.isVerified ? "text-green-700" : "text-red-600"}`}>
               {user.isVerified ? "✓ Verified" : "✗ Not Verified"}
             </span>
-
-            <span
-              style={{
-                fontSize: 13,
-                color: "#6b7280",
-              }}
-            >
-              Joined {joinedDate}
-            </span>
+            <span className="text-[13px] text-gray-500">Joined {joinedDate}</span>
           </div>
         </div>
       </div>
 
-      <Button
-        variant="solid"
-        size="md"
-        onClick={handleEditProfile} // or navigate to edit profile
-        >
+      <Button variant="solid" size="md" onClick={() => navigate('/editProfilePage')}>
         Edit Profile
-        </Button>
+      </Button>
     </div>
   );
 }
