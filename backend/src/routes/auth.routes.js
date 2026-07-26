@@ -10,7 +10,9 @@ import {
   sendVerificationCodeController,
   verifyEmailController,
   refreshTokenController,
-  
+  forgotPasswordController,
+  verifyResetOtpController,
+  resetPasswordController,
 } from "../controllers/auth.controller.js";
 
 import { validate } from "../middleware/validate.js";
@@ -20,7 +22,10 @@ import {
   verifyOtpSchema,
   loginSchema,
   sendVerificationCodeSchema,
-  verifyEmailSchema
+  verifyEmailSchema,
+  forgotPasswordSchema,
+  verifyResetOtpSchema,
+  resetPasswordSchema,
 } from "../validators/auth.validators.js";
 
 import { verifyOtp } from "../services/auth.service.js";
@@ -69,16 +74,13 @@ authRoutes.post(
 );
 
 
-authRoutes.post(
-  "/logout",
-  logoutController
-);
+authRoutes.post("/logout", logoutController);
 
-authRoutes.get(
-  "/me",
-  authenticate,
-  getMeController
-);
+authRoutes.post("/forgot-password", validate(forgotPasswordSchema), forgotPasswordController);
+authRoutes.post("/verify-reset-otp", validate(verifyResetOtpSchema), verifyResetOtpController);
+authRoutes.post("/reset-password", validate(resetPasswordSchema), resetPasswordController);
+
+authRoutes.get("/me", authenticate, getMeController);
 
 
 export default authRoutes;

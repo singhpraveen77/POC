@@ -12,6 +12,7 @@ import { hashPassword, hashToken } from "../utils/hash.js";
 import { sendMail } from "../utils/sendMail.js";
 import logger from "../../config/logger.js";
 import { verifyEmailTemplate } from "../../templates/email.verify.js";
+import { resetPasswordTemplate } from "../../templates/email.reset.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import AppError from "../utils/AppError.js";
 
@@ -284,3 +285,89 @@ export const verifyEmail = async (data) => {
 };
 
 
+
+export const forgotPassword = async ({ email }) => {
+  const user = await findByEmail(email);
+  if (!user) {
+    throw new AppError("No account found with this email", StatusCodes.NOT_FOUND);
+  }
+
+  if (!user.isVerified) {
+    throw new AppError("Please verify your email before resetting your password", StatusCodes.FORBIDDEN);
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedOtp = await hashPassword(otp);
+  const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+  await updateUser(user.id, {
+    emailVerificationToken: hashedOtp,
+    emailVerificationExpire: otpExpiry,
+  });
+
+  const subject = "Reset Your Password - OTP Code";
+  const html = resetPasswordTemplate(user.name, otp);
+
+  try {
+    await sendMail(email, subject, html);
+    logger.info(`[AuthService] Password reset OTP sent to: ${email}`);
+  } catch (mailError) {
+    logger.error(`[AuthService] Failed to send reset email: ${mailError.message}`);
+    throw new AppError("Failed to send reset email. Please try again.", StatusCodes.INTERNAL_SERVER_ERROR);
+  }
+
+  return { email };
+};
+
+export const verifyResetOtp = async ({ email, otp }) => {
+  const user = await findByEmail(email);
+  if (!user) {
+    throw new AppError("User not found", StatusCodes.NOT_FOUND);
+  }
+
+  if (!user.emailVerificationToken || !user.emailVerificationExpire) {
+    throw new AppError("No password reset was requested", StatusCodes.BAD_REQUEST);
+  }
+
+  if (new Date() > user.emailVerificationExpire) {
+    throw new AppError("OTP has expired. Please request a new one.", StatusCodes.GONE);
+  }
+
+  const match = await isMatch(otp, user.emailVerificationToken);
+  if (!match) {
+    throw new AppError("Invalid OTP", StatusCodes.BAD_REQUEST);
+  }
+
+  return { email, verified: true };
+};
+
+export const resetPassword = async ({ email, otp, newPassword }) => {
+  const user = await findByEmail(email);
+  if (!user) {
+    throw new AppError("User not found", StatusCodes.NOT_FOUND);
+  }
+
+  if (!user.emailVerificationToken || !user.emailVerificationExpire) {
+    throw new AppError("No password reset was requested", StatusCodes.BAD_REQUEST);
+  }
+
+  if (new Date() > user.emailVerificationExpire) {
+    throw new AppError("OTP has expired. Please request a new one.", StatusCodes.GONE);
+  }
+
+  const match = await isMatch(otp, user.emailVerificationToken);
+  if (!match) {
+    throw new AppError("Invalid OTP", StatusCodes.BAD_REQUEST);
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  await updateUser(user.id, {
+    password: hashedPassword,
+    emailVerificationToken: null,
+    emailVerificationExpire: null,
+  });
+
+  logger.info(`[AuthService] Password reset successfully for: ${email}`);
+  return { message: "Password reset successfully" };
+};

@@ -3,15 +3,24 @@ import { getWorkspaceById } from "./workspace.service.js";
 import AppError from "../utils/AppError.js";
 import logger from "../../config/logger.js";
 import { StatusCodes } from "http-status-codes";
+import prisma from "../../config/prisma.js";
+
+const getMemberRole = async (userId, workspaceId) => {
+  const membership = await prisma.workspaceMember.findUnique({
+    where: { workspaceId_userId: { workspaceId, userId } }
+  });
+  return membership?.role ?? null;
+};
 
 export const createBoard = async (userId, data) => {
   logger.info(`[BoardService] Starting createBoard for user ${userId} in workspace ${data.workspaceId}`);
-  
-  // Verify the user has access to this workspace
-  logger.info(`[BoardService] Verifying user access to workspace ${data.workspaceId}`);
   await getWorkspaceById(userId, data.workspaceId);
 
-  // Determine the next position
+  const role = await getMemberRole(userId, data.workspaceId);
+  if (role === "VIEWER") {
+    throw new AppError("Viewers cannot create boards", StatusCodes.FORBIDDEN);
+  }
+
   logger.info(`[BoardService] Fetching existing boards to calculate position`);
   const existingBoards = await boardRepo.getBoardsByWorkspaceId(data.workspaceId);
   const maxPosition = existingBoards.length > 0 
@@ -46,7 +55,6 @@ export const getBoardById = async (userId, boardId) => {
     throw new AppError("Board not found", StatusCodes.NOT_FOUND);
   }
 
-  // Ensure user has access to the workspace of the board
   logger.info(`[BoardService] Verifying workspace access for board ${boardId}`);
   await getWorkspaceById(userId, board.workspaceId);
   logger.info(`[BoardService] Board retrieved successfully`);
@@ -57,6 +65,11 @@ export const updateBoard = async (userId, boardId, data) => {
   logger.info(`[BoardService] Updating board ${boardId} for user ${userId}`);
   const board = await getBoardById(userId, boardId);
 
+  const role = await getMemberRole(userId, board.workspaceId);
+  if (role === "VIEWER" || role === "MEMBER") {
+    throw new AppError("Only Admins and Owners can update boards", StatusCodes.FORBIDDEN);
+  }
+
   logger.info(`[BoardService] Saving board updates to repository`);
   const updatedBoard = await boardRepo.updateBoard(boardId, data);
   logger.info(`[BoardService] Board updated successfully`);
@@ -65,8 +78,13 @@ export const updateBoard = async (userId, boardId, data) => {
 
 export const deleteBoard = async (userId, boardId) => {
   logger.info(`[BoardService] Deleting board ${boardId} for user ${userId}`);
-  await getBoardById(userId, boardId);
-  
+  const board = await getBoardById(userId, boardId);
+
+  const role = await getMemberRole(userId, board.workspaceId);
+  if (role === "VIEWER" || role === "MEMBER") {
+    throw new AppError("Only Admins and Owners can delete boards", StatusCodes.FORBIDDEN);
+  }
+
   logger.info(`[BoardService] Removing board from repository`);
   const result = await boardRepo.deleteBoard(boardId);
   logger.info(`[BoardService] Board deleted successfully`);

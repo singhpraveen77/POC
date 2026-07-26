@@ -21,7 +21,12 @@ export const getBoardById = (id) => {
         orderBy: { position: "asc" },
         include: {
           tasks: {
-            orderBy: { position: "asc" }
+            orderBy: { position: "asc" },
+            include: {
+              assignee: {
+                select: { id: true, name: true, username: true, profileImage: true }
+              }
+            }
           }
         }
       }

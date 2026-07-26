@@ -57,6 +57,9 @@ model User {
   tasksCreated  Task[]  @relation("TaskCreator")
   assignedTasks Task[]  @relation("TaskAssignee")
 
+  invitesSent     WorkspaceInvite[] @relation("InviteSender")
+  invitesReceived WorkspaceInvite[] @relation("InviteReceiver")
+
   // audit
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -75,6 +78,7 @@ model Workspace {
   // relations
   members WorkspaceMember[]
   boards  Board[]
+  invites WorkspaceInvite[]
 
   // audit
   createdAt DateTime @default(now())
@@ -232,4 +236,38 @@ model RefreshToken{
 
   @@index([userId])
 
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+model WorkspaceInvite {
+  id String @id @default(uuid())
+
+  workspaceId   String
+  invitedById   String
+  invitedUserId String
+
+  role   WorkspaceRole @default(MEMBER)
+  status InviteStatus  @default(PENDING)
+
+  workspace   Workspace @relation(fields: [workspaceId],   references: [id], onDelete: Cascade)
+  invitedBy   User      @relation("InviteSender",   fields: [invitedById],   references: [id], onDelete: Cascade)
+  invitedUser User      @relation("InviteReceiver", fields: [invitedUserId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([workspaceId, invitedUserId])
+
+  @@index([workspaceId])
+  @@index([invitedUserId])
+  @@index([invitedById])
+  @@index([status])
+
+  @@map("workspace_invites")
 }

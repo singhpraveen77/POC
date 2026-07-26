@@ -16,5 +16,6 @@ export const updateTaskSchema = z.object({
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
   position: z.number().int().min(0).optional(),
   columnId: z.string().uuid("Invalid column ID").optional(),
-  assigneeId: z.string().uuid().optional().nullable()
+  assigneeId: z.string().uuid().optional().nullable(),
+  isDnd: z.boolean().optional()
 });

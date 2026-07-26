@@ -10,6 +10,9 @@ import columnRoutes from "./src/routes/column.routes.js";
 import taskRoutes from "./src/routes/task.routes.js";
 import { StatusCodes } from "http-status-codes";
 import profileRoutes from "./src/routes/profile.routes.js";
+import { inviteRoutes, workspaceInviteRoutes } from "./src/routes/invite.routes.js";
+import memberRoutes from "./src/routes/member.routes.js";
+import userSearchRoutes from "./src/routes/userSearch.routes.js";
 
 const app = express();
 
@@ -56,6 +59,10 @@ app.use("/api/workspaces", workspaceRoutes);
 app.use("/api/boards", boardRoutes);
 app.use("/api/columns", columnRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/workspaces", memberRoutes);
+app.use("/api/workspaces/:workspaceId/invites", workspaceInviteRoutes);
+app.use("/api/invites", inviteRoutes);
+app.use("/api/users", userSearchRoutes);
 app.use(errorHandler);
 
 export default app;

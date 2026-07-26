@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
-const hashRounds=process.env.Hash_Rounds;
+const hashRounds = parseInt(process.env.Hash_Rounds, 10) || 10;
 export const hashPassword = (password) => {
   return bcrypt.hash(password, hashRounds);
 };

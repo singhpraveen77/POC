@@ -1,3 +1,4 @@
+import http from "http";
 import app from "./app.js";
 import { connectDB } from "./config/db.js";
 import dotenv from "dotenv";
@@ -17,7 +18,9 @@ const startServer = async () => {
     
     await connectDB();
 
-    const server = app.listen(process.env.PORT, () => {
+    const httpServer = http.createServer(app);
+
+    const server = httpServer.listen(process.env.PORT, () => {
       logger.info(` Server running on port ${process.env.PORT}`);
     });
 
