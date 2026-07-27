@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import ProfileStats from "../components/Profile/ProfileStats";
-import RecentWorkspaces from "../components/Profile/RecentWorkspaces";
-import RecentBoards from "../components/Profile/RecentBoards";
-import RecentTasks from "../components/Profile/RecentTasks";
-import ProfileHeader from "../components/profile/ProfileHeader";
+import ProfileStats from "../components/Profile/ProfileStats.jsx";
+import RecentWorkspaces from "../components/Profile/RecentWorkspaces.jsx";
+import RecentBoards from "../components/Profile/RecentBoards.jsx";
+import RecentTasks from "../components/Profile/RecentTasks.jsx";
+import ProfileHeader from "../components/profile/ProfileHeader.jsx";
 import { getProfile } from "../redux/profile/profileThunk";
-import MainLoader from "../components/loader/MainLoader";
+import MainLoader from "../components/loader/MainLoader.jsx";
 import { fetchIncomingInvites, acceptInvite, rejectInvite, cancelInvite } from "../redux/invite/workspaceInviteSlice";
-import RoleBadge from "../components/collaboration/RoleBadge";
-import Button from "../components/common/Button";
+import RoleBadge from "../components/collaboration/RoleBadge.jsx";
+import Button from "../components/common/Button.jsx";
 
 export default function ProfilePage() {
   const dispatch = useDispatch();
