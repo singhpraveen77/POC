@@ -53,7 +53,7 @@ export default function ProfilePage() {
         <div className="bg-[var(--color-surface)] rounded-xl border border-[var(--color-outline-variant)] overflow-hidden">
           <div className="px-6 pt-5 pb-0">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[17px] font-bold m-0 text-[var(--color-on-surface)]">Invitations</h2>
+              <h2 className="text-[17px]  m-0 text-[var(--color-on-surface)]">Invitations</h2>
               <Button variant="outline" size="sm" icon="refresh" onClick={() => dispatch(fetchIncomingInvites())}>
                 Refresh
               </Button>
@@ -64,9 +64,9 @@ export default function ProfilePage() {
                   key={tab}
                   onClick={() => setActiveInviteTab(tab)}
                   className={[
-                    "bg-transparent border-0 cursor-pointer px-4 py-2 text-sm font-semibold capitalize transition-all duration-150 -mb-px",
+                    "bg-transparent border-none cursor-pointer px-4 py-2 text-sm  capitalize transition-all duration-150 -mb-px",
                     activeInviteTab === tab
-                      ? "text-[var(--color-primary)] border-b-2 border-[var(--color-primary)]"
+                      ? "text-[var(--color-primary)] border-b-2 "
                       : "text-[var(--color-on-surface-variant)] border-b-2 border-transparent"
                   ].join(" ")}
                 >
@@ -87,7 +87,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-[var(--color-on-surface-variant)] text-center py-4">No incoming invitations</p>
               ) : (
                 incoming.map((invite) => (
-                  <div key={invite.id} className="flex items-center gap-3 px-4 py-3 border border-[var(--color-outline-variant)] rounded-lg bg-[var(--color-surface-container-lowest)]">
+                  <div key={invite.id} className="flex items-center gap-3 px-4 py-3 border rounded-lg bg-[var(--color-surface-container-lowest)]">
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-sm m-0 mb-0.5 text-[var(--color-on-surface)]">{invite.workspace?.name}</p>
                       <p className="text-xs m-0 text-[var(--color-on-surface-variant)]">Invited by {invite.invitedBy?.name}</p>
@@ -115,7 +115,7 @@ export default function ProfilePage() {
                       <p className="text-xs m-0 text-[var(--color-on-surface-variant)]">@{invite.invitedUser?.username}</p>
                     </div>
                     <RoleBadge role={invite.role} />
-                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#fef9c3] text-[#a16207]">{invite.status}</span>
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full text-[#a16207]">{invite.status}</span>
                     <Button variant="outline" size="sm" onClick={() => dispatch(cancelInvite({ workspaceId: invite.workspaceId, inviteId: invite.id }))}>Cancel</Button>
                   </div>
                 ))

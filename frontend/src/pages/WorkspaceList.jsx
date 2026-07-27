@@ -128,10 +128,10 @@ export default function WorkspaceList() {
               className="p-6 bg-[var(--color-surface)] border border-[var(--color-outline-variant)] rounded-lg cursor-pointer flex justify-between items-start transition-all duration-200 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-gray-300"
             >
               <div className="flex-1 min-w-0 pr-4">
-                <h2 className="text-[17px] font-bold mt-0 mb-1 text-[var(--color-on-surface)] overflow-hidden text-ellipsis whitespace-nowrap">
+                <h2 className="text-[17px] font-bold mt-0 mb-1 text-[var(--color-on-surface)] overflow-y-auto text-ellipsis whitespace-nowrap">
                   {ws.name}
                 </h2>
-                <p className="text-[13px] text-[var(--color-on-surface-variant)] mt-0 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                <p className="text-[13px] text-[var(--color-on-surface-variant)] mt-0 mb-2 overflow-y-auto text-ellipsis whitespace-nowrap">
                   {ws.slug}
                 </p>
                 {myRole && <RoleBadge role={myRole} />}

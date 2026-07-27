@@ -17,7 +17,7 @@ export default function Layout() {
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, overflow: 'hidden', height: '100%' }}>
         <Navbar onMenuToggle={() => setSidebarOpen(prev => !prev)} />
         {/* Page area — fills remaining height */}
-        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
           <Outlet />
         </div>
       </div>

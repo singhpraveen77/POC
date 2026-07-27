@@ -21,7 +21,7 @@ export default function InvitationsPage() {
   return (
     <div className="px-6 py-10 max-w-[900px] mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-display-md text-[var(--color-on-surface)] m-0 font-extrabold">
+        <h1 className="text-display-md text-[var(--color-on-surface)] m-0 font-weight: 300 ">
           Invitations
         </h1>
         <Button variant="outline" size="sm" icon="refresh" onClick={() => dispatch(fetchIncomingInvites())}>
@@ -34,7 +34,7 @@ export default function InvitationsPage() {
           className={
             activeTab === "incoming"
               ? "px-5 py-2 rounded-md border-none cursor-pointer font-semibold text-sm bg-[#f97316] text-white"
-              : "px-5 py-2 rounded-md border border-[var(--color-outline-variant)] cursor-pointer font-semibold text-sm bg-transparent text-[var(--color-on-surface-variant)]"
+              : "px-5 py-2 rounded-md border-none  cursor-pointer font-semibold text-sm bg-transparent text-[var(--color-on-surface-variant)]"
           }
           onClick={() => setActiveTab("incoming")}
         >
@@ -44,7 +44,7 @@ export default function InvitationsPage() {
           className={
             activeTab === "outgoing"
               ? "px-5 py-2 rounded-md border-none cursor-pointer font-semibold text-sm bg-[#f97316] text-white"
-              : "px-5 py-2 rounded-md border border-[var(--color-outline-variant)] cursor-pointer font-semibold text-sm bg-transparent text-[var(--color-on-surface-variant)]"
+              : "px-5 py-2 rounded-md border-none cursor-pointer font-semibold text-sm bg-transparent text-[var(--color-on-surface-variant)]"
           }
           onClick={() => setActiveTab("outgoing")}
         >

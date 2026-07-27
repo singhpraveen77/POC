@@ -18,7 +18,7 @@ export default function WorkspaceMembersPage() {
   }, [workspaceId, dispatch]);
 
   return (
-    <div className="px-6 py-10 max-w-[900px] mx-auto">
+    <div className="px-6 py-10 min-w-[900px] w- mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-display-md text-[var(--color-on-surface)] m-0 font-extrabold">Members</h1>

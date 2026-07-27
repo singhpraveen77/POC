@@ -8,7 +8,6 @@ import { extractFieldErrors } from "../utils/errorHelper";
 import toast from "react-hot-toast";
 import { BoardSkeleton } from "../components/loader/BoardLoader";
 import { fetchMembers } from '../redux/member/workspaceMemberSlice'
-import MemberAvatarGroup from '../components/collaboration/MemberAvatarGroup'
 import InviteMemberModal from '../components/collaboration/InviteMemberModal'
 import { validateBoard, hasErrors } from '../utils/validators'
 
@@ -118,7 +117,7 @@ export default function BoardList() {
           <p className="text-[var(--color-on-surface-variant)] mt-1 mb-0 text-sm">Manage your workflows, tasks, and column groupings.</p>
         </div>
         <div className="flex items-center gap-3">
-          <MemberAvatarGroup members={members} />
+          
           <Button variant="outline" size="sm" onClick={handleRefresh} icon="refresh">
             Refresh
           </Button>

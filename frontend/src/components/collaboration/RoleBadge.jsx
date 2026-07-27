@@ -1,8 +1,8 @@
 const ROLE_STYLES = {
-  OWNER: 'bg-orange-100 text-orange-700',
-  ADMIN: 'bg-blue-100 text-blue-700',
-  MEMBER: 'bg-green-100 text-green-700',
-  VIEWER: 'bg-gray-100 text-gray-600',
+  OWNER: ' text-orange-700',
+  ADMIN: 'text-blue-700',
+  MEMBER: ' text-green-700',
+  VIEWER: 'text-gray-600',
 }
 
 export default function RoleBadge({ role }) {
