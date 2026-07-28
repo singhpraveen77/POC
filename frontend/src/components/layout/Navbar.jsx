@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux'
 import { useState } from 'react';
 import ProfileAvatar from '../profile/ProfileAvatar.jsx';
-import ProfileCard from '../profile/profileCard.jsx';
+import ProfileCard from '../profile/ProfileCard.jsx';
 
 export default function Navbar({ onMenuToggle }) {
   const { user } = useSelector(state => state.auth)
@@ -91,7 +91,7 @@ export default function Navbar({ onMenuToggle }) {
     </div>
 
     {showProfile && (
-      <ProfileCard/>
+      <ProfileCard />
     )}
       </div>
     </div>
