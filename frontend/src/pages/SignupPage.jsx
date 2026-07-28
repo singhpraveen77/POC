@@ -7,7 +7,7 @@ import { extractFieldErrors, extractFieldErrorsRegister } from '../utils/errorHe
 import toast from 'react-hot-toast'
 
 import AuthInput from '../components/auth/AuthInput.jsx'
-import { registerSchema } from '../validators/auth.validators.js.jsx'
+import { registerSchema } from '../validators/auth.validators.js'
 
 export default function SignupPage() {
   const dispatch = useDispatch()

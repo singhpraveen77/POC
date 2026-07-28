@@ -4,7 +4,7 @@ import { fetchWorkspaces, createWorkspace, updateWorkspace, deleteWorkspace } fr
 import { useNavigate } from "react-router-dom";
 import Button from "../components/common/Button.jsx";
 import Modal from "../components/common/Modal.jsx";
-import { extractFieldErrors } from "../utils/errorHelper";
+import { extractFieldErrors } from "../utils/errorHelper.js";
 import toast from "react-hot-toast";
 import { WorkspaceSkeleton } from "../components/loader/WorkspaceLoader.jsx";
 import RoleBadge from "../components/collaboration/RoleBadge.jsx";

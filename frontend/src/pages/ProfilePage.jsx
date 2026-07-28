@@ -6,7 +6,7 @@ import RecentWorkspaces from "../components/profile/RecentWorkspaces.jsx";
 import RecentBoards from "../components/profile/RecentBoards.jsx";
 import RecentTasks from "../components/profile/RecentTasks.jsx";
 import ProfileHeader from "../components/profile/ProfileHeader.jsx";
-import { getProfile } from "../redux/profile/profileThunk";
+import { getProfile } from "../redux/profile/profileThunk.js";
 import MainLoader from "../components/loader/MainLoader.jsx";
 import { fetchIncomingInvites, acceptInvite, rejectInvite, cancelInvite } from "../redux/invite/workspaceInviteSlice.js";
 import RoleBadge from "../components/collaboration/RoleBadge.jsx";
