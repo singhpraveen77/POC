@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBoards, createBoard, updateBoard, deleteBoard } from "../redux/board/boardSlice";
+import { fetchBoards, createBoard, updateBoard, deleteBoard } from "../redux/board/boardSlice.js";
 import { useNavigate, useParams } from "react-router-dom";
-import Button from "../components/common/Button";
-import Modal from "../components/common/Modal";
-import { extractFieldErrors } from "../utils/errorHelper";
+import Button from "../components/common/Button.jsx";
+import Modal from "../components/common/Modal.jsx";
+import { extractFieldErrors } from "../utils/errorHelper.js";
 import toast from "react-hot-toast";
-import { BoardSkeleton } from "../components/loader/BoardLoader";
-import { fetchMembers } from '../redux/member/workspaceMemberSlice'
-import InviteMemberModal from '../components/collaboration/InviteMemberModal'
-import { validateBoard, hasErrors } from '../utils/validators'
+import { BoardSkeleton } from "../components/loader/BoardLoader.jsx";
+import { fetchMembers } from '../redux/member/workspaceMemberSlice.js'
+import InviteMemberModal from '../components/collaboration/InviteMemberModal.jsx'
+import { validateBoard, hasErrors } from '../utils/validators.js'
 
 
 

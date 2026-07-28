@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { resetPassword } from "../redux/auth/authThunk";
-import { resetPasswordSchema } from "../validators/auth.validators";
-import AuthInput from "../components/auth/AuthInput";
-import Button from "../components/common/Button";
+import { resetPassword } from "../redux/auth/authThunk.js";
+import { resetPasswordSchema } from "../validators/auth.validators.js";
+import AuthInput from "../components/auth/AuthInput.jsx";
+import Button from "../components/common/Button.jsx";
 import toast from "react-hot-toast";
 
 export default function ResetPasswordPage() {

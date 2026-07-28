@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
-import MainLoader from "../components/loader/MainLoader";
-import EditProfileForm from "../components/profile/EditProfileForm";
+import MainLoader from "../components/loader/MainLoader.jsx";
+import EditProfileForm from "../components/profile/EditProfileForm.jsx";
 import { useEffect } from "react";
-import { getProfile } from "../redux/profile/profileThunk";
+import { getProfile } from "../redux/profile/profileThunk.js";
 
 export default function EditProfilePage() {
   const dispatch = useDispatch();

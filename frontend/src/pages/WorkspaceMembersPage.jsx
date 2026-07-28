@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchMembers } from "../redux/member/workspaceMemberSlice";
-import MemberList from "../components/collaboration/MemberList";
+import { fetchMembers } from "../redux/member/workspaceMemberSlice.js";
+import MemberList from "../components/collaboration/MemberList.jsx";
 import { TailSpin } from "react-loader-spinner";
 
 export default function WorkspaceMembersPage() {

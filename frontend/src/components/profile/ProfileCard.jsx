@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../../redux/auth/authThunk";
+import { logoutUser } from "../../redux/auth/authThunk.js";
 import { useNavigate } from "react-router-dom";
-import ProfileAvatar from "./ProfileAvatar";
+import ProfileAvatar from "./ProfileAvatar.jsx";
 
 export default function ProfileCard() {
     const { user } = useSelector(state => state.auth)

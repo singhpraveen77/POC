@@ -1,5 +1,5 @@
-import BoardCard from "./BoardCard";
-import EmptyState from "./EmptyState";
+import BoardCard from "./BoardCard.jsx";
+import EmptyState from "./EmptyState.jsx";
 
 export default function RecentBoards({ boards }) {
   return (

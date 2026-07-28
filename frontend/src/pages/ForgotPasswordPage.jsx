@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { forgotPassword } from "../redux/auth/authThunk";
-import { forgotPasswordSchema } from "../validators/auth.validators";
-import AuthInput from "../components/auth/AuthInput";
-import Button from "../components/common/Button";
+import { forgotPassword } from "../redux/auth/authThunk.js";
+import { forgotPasswordSchema } from "../validators/auth.validators.js";
+import AuthInput from "../components/auth/AuthInput.jsx";
+import Button from "../components/common/Button.jsx";
 import toast from "react-hot-toast";
 
 export default function ForgotPasswordPage() {

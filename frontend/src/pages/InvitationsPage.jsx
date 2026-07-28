@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchIncomingInvites } from "../redux/invite/workspaceInviteSlice";
-import IncomingInviteCard from "../components/collaboration/IncomingInviteCard";
-import OutgoingInviteCard from "../components/collaboration/OutgoingInviteCard";
+import { fetchIncomingInvites } from "../redux/invite/workspaceInviteSlice.js";
+import IncomingInviteCard from "../components/collaboration/IncomingInviteCard.jsx";
+import OutgoingInviteCard from "../components/collaboration/OutgoingInviteCard.jsx";
 import { TailSpin } from "react-loader-spinner";
-import Button from "../components/common/Button";
+import Button from "../components/common/Button.jsx";
 
 export default function InvitationsPage() {
   const dispatch = useDispatch();

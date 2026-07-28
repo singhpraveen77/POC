@@ -1,5 +1,5 @@
-import WorkspaceCard from "./WorkspaceCard";
-import EmptyState from "./EmptyState";
+import WorkspaceCard from "./WorkspaceCard.jsx";
+import EmptyState from "./EmptyState.jsx";
 
 export default function RecentWorkspaces({ workspaces }) {
   return (

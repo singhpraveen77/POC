@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import Input from "../common/Input";
-import Button from "../common/Button";
+import Input from "../common/Input.jsx";
+import Button from "../common/Button.jsx";
 
-import ProfileAvatar from "./ProfileAvatar";
-import ProfileInfoCard from "./ProfileInfoCard";
+import ProfileAvatar from "./ProfileAvatar.jsx";
+import ProfileInfoCard from "./ProfileInfoCard.jsx";
 
-import { updateProfile, uploadProfileImage } from "../../redux/profile/profileThunk";
-import { updateProfileSchema } from "../../validators/profileValidation";
+import { updateProfile, uploadProfileImage } from "../../redux/profile/profileThunk.js";
+import { updateProfileSchema } from "../../validators/profileValidation.js";
 
 export default function EditProfileForm({ user }) {
   const dispatch = useDispatch();

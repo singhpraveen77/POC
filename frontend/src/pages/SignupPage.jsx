@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { register } from '../redux/auth/authThunk'
-import Button from '../components/common/Button'
-import { extractFieldErrors, extractFieldErrorsRegister } from '../utils/errorHelper'
+import Button from '../components/common/Button.jsx'
+import { extractFieldErrors, extractFieldErrorsRegister } from '../utils/errorHelper.js'
 import toast from 'react-hot-toast'
 
-import AuthInput from '../components/auth/AuthInput'
-import { registerSchema } from '../validators/auth.validators'
+import AuthInput from '../components/auth/AuthInput.jsx'
+import { registerSchema } from '../validators/auth.validators.js.jsx'
 
 export default function SignupPage() {
   const dispatch = useDispatch()

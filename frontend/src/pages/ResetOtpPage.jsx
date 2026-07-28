@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { verifyResetOtp, forgotPassword } from "../redux/auth/authThunk";
-import { verifyResetOtpSchema } from "../validators/auth.validators";
-import AuthInput from "../components/auth/AuthInput";
-import Button from "../components/common/Button";
+import { verifyResetOtp, forgotPassword } from "../redux/auth/authThunk.js";
+import { verifyResetOtpSchema } from "../validators/auth.validators.js";
+import AuthInput from "../components/auth/AuthInput.jsx";
+import Button from "../components/common/Button.jsx";
 import toast from "react-hot-toast";
 
 export default function ResetOtpPage() {

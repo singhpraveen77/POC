@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { verifyEmail, sendVerificationCode } from "../redux/auth/authThunk";
-import { clearError } from "../redux/auth/authSlice";
-import Button from "../components/common/Button";
-import { extractFieldErrors } from "../utils/errorHelper";
+import { verifyEmail, sendVerificationCode } from "../redux/auth/authThunk.js";
+import { clearError } from "../redux/auth/authSlice.js";
+import Button from "../components/common/Button.jsx";
+import { extractFieldErrors } from "../utils/errorHelper.js";
 import toast from "react-hot-toast";
 
 export default function VerifyEmailCodePage() {

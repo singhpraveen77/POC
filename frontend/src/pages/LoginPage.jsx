@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { clearError } from "../redux/auth/authSlice";
-import { login } from "../redux/auth/authThunk";
-import AuthInput from "../components/auth/AuthInput";
-import Button from "../components/common/Button";
-import { extractFieldErrors } from "../utils/errorHelper";
+import { clearError } from "../redux/auth/authSlice.js";
+import { login } from "../redux/auth/authThunk.js";
+import AuthInput from "../components/auth/AuthInput.jsx";
+import Button from "../components/common/Button.jsx";
+import { extractFieldErrors } from "../utils/errorHelper.js";
 import toast from "react-hot-toast";
-import { loginSchema } from "../validators/auth.validators";
+import { loginSchema } from "../validators/auth.validators.js";
 
 export default function LoginPage() {
   const dispatch = useDispatch();

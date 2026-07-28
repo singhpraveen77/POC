@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { sendVerificationCode } from "../redux/auth/authThunk";
-import { clearError } from "../redux/auth/authSlice";
-import AuthInput from "../components/auth/AuthInput";
-import Button from "../components/common/Button";
-import { extractFieldErrors } from "../utils/errorHelper";
+import { sendVerificationCode } from "../redux/auth/authThunk.js";
+import { clearError } from "../redux/auth/authSlice.js";
+import AuthInput from "../components/auth/AuthInput.jsx";
+import Button from "../components/common/Button.jsx";
+import { extractFieldErrors } from "../utils/errorHelperjs";
 import toast from "react-hot-toast";
 
-export default function VerifyEmailPage() {
+export default function jsVerifyEmailPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.auth);

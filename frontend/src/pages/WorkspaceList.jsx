@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchWorkspaces, createWorkspace, updateWorkspace, deleteWorkspace } from "../redux/workspace/workspaceSlice";
+import { fetchWorkspaces, createWorkspace, updateWorkspace, deleteWorkspace } from "../redux/workspace/workspaceSlice.js";
 import { useNavigate } from "react-router-dom";
-import Button from "../components/common/Button";
-import Modal from "../components/common/Modal";
+import Button from "../components/common/Button.jsx";
+import Modal from "../components/common/Modal.jsx";
 import { extractFieldErrors } from "../utils/errorHelper";
 import toast from "react-hot-toast";
-import { WorkspaceSkeleton } from "../components/loader/WorkspaceLoader";
-import RoleBadge from "../components/collaboration/RoleBadge";
-import { validateWorkspace, hasErrors } from "../utils/validators";
+import { WorkspaceSkeleton } from "../components/loader/WorkspaceLoader.jsx";
+import RoleBadge from "../components/collaboration/RoleBadge.jsx";
+import { validateWorkspace, hasErrors } from "../utils/validators.js";
 
 
 

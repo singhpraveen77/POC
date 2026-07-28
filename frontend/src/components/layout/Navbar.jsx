@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux'
-import ProfileCard from '../profile/profileCard';
 import { useState } from 'react';
-import ProfileAvatar from '../profile/ProfileAvatar';
+import ProfileAvatar from '../profile/ProfileAvatar.jsx';
+import ProfileCard from '../profile/profileCard.jsx';
 
 export default function Navbar({ onMenuToggle }) {
   const { user } = useSelector(state => state.auth)

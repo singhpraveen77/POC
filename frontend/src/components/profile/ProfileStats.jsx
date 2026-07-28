@@ -1,4 +1,4 @@
-import StatsCard from "./StatsCard";
+import StatsCard from "./StatsCard.jsx";
 
 export default function ProfileStats({ stats }) {
   const statItems = [

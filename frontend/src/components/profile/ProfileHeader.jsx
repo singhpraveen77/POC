@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import Button from "../common/Button";
-import ProfileAvatar from "./ProfileAvatar";
+import Button from "../common/Button.jsx";
+import ProfileAvatar from "./ProfileAvatar.jsx";
 
 export default function ProfileHeader({ user }) {
   const navigate = useNavigate();
