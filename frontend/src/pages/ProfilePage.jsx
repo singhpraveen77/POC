@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import ProfileStats from "../components/Profile/ProfileStats.jsx";
-import RecentWorkspaces from "../components/Profile/RecentWorkspaces.jsx";
-import RecentBoards from "../components/Profile/RecentBoards.jsx";
-import RecentTasks from "../components/Profile/RecentTasks.jsx";
+import ProfileStats from "../components/profile/ProfileStats.jsx";
+import RecentWorkspaces from "../components/profile/RecentWorkspaces.jsx";
+import RecentBoards from "../components/profile/RecentBoards.jsx";
+import RecentTasks from "../components/profile/RecentTasks.jsx";
 import ProfileHeader from "../components/profile/ProfileHeader.jsx";
 import { getProfile } from "../redux/profile/profileThunk";
 import MainLoader from "../components/loader/MainLoader.jsx";
