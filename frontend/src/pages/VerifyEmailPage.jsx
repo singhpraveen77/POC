@@ -5,7 +5,7 @@ import { sendVerificationCode } from "../redux/auth/authThunk.js";
 import { clearError } from "../redux/auth/authSlice.js";
 import AuthInput from "../components/auth/AuthInput.jsx";
 import Button from "../components/common/Button.jsx";
-import { extractFieldErrors } from "../utils/errorHelperjs";
+import { extractFieldErrors } from "../utils/errorHelper.js";
 import toast from "react-hot-toast";
 
 export default function jsVerifyEmailPage() {
