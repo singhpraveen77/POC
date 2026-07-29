@@ -18,7 +18,6 @@ export const validateWorkspace = ({ name, slug }) => {
   }
   return errors;
 };
-
 export const validateBoard = ({ name }) => {
   const errors = {};
   if (!name || name.trim().length === 0) {
@@ -30,7 +29,6 @@ export const validateBoard = ({ name }) => {
   }
   return errors;
 };
-
 export const validateColumn = ({ name }) => {
   const errors = {};
   if (!name || name.trim().length === 0) {
@@ -40,7 +38,6 @@ export const validateColumn = ({ name }) => {
   }
   return errors;
 };
-
 export const validateTask = ({ title }) => {
   const errors = {};
   if (!title || title.trim().length === 0) {
@@ -50,5 +47,4 @@ export const validateTask = ({ title }) => {
   }
   return errors;
 };
-
 export const hasErrors = (errors) => Object.keys(errors).length > 0;

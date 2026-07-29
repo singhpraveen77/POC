@@ -1,37 +1,9 @@
-import { TailSpin } from "react-loader-spinner";
-
-export default function MainLoader({
-  message = "Just wait a second...",
-}) {
+import { TailSpin } from 'react-loader-spinner'
+export default function MainLoader({ message = 'Loading…' }) {
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100vh",
-        minHeight: "100%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: "1rem",
-        padding: "2rem",
-      }}
-    >
-      <TailSpin
-        height={50}
-        width={50}
-        color="#F97316"
-        ariaLabel="loading"
-      />
-
-      <span
-        style={{
-          fontSize: "1rem",
-          color: "#4B5563",
-          fontWeight: 500,
-        }}
-      >
-        {message}
-      </span>
+    <div className="w-full h-screen flex items-center justify-center gap-4 p-8">
+      <TailSpin height={48} width={48} color="#669DF1" ariaLabel="loading" />
+      <span className="text-base font-medium text-[var(--color-text-muted)]">{message}</span>
     </div>
-  );
+  )
 }

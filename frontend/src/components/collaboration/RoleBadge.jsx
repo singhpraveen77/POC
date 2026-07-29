@@ -1,14 +1,18 @@
-const ROLE_STYLES = {
-  OWNER: ' text-orange-700',
-  ADMIN: 'text-blue-700',
-  MEMBER: ' text-green-700',
-  VIEWER: 'text-gray-600',
-}
-
 export default function RoleBadge({ role }) {
-  const colorClasses = ROLE_STYLES[role] ?? ROLE_STYLES.VIEWER
+  const ROLE_STYLES = {
+    OWNER:  { text: 'var(--color-btn-text)' },
+    ADMIN:  { text: '#FFFFFF' },
+    MEMBER: { text: '#FFFFFF' },
+    VIEWER: {  text: '#FFFFFF' },
+  }
+  const style = ROLE_STYLES[role] ?? ROLE_STYLES.VIEWER
   return (
-    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${colorClasses}`}>
+    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full
+      ${role === 'OWNER' ? ' text-green-300' : ''}
+      ${role === 'ADMIN' ? ' text-white' : ''}
+      ${role === 'MEMBER' ? ' text-white' : ''}
+      ${role === 'VIEWER' ? ' text-white' : ''}`}
+    >
       {role}
     </span>
   )

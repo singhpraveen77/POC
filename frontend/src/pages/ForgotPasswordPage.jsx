@@ -6,15 +6,12 @@ import { forgotPasswordSchema } from "../validators/auth.validators.js";
 import AuthInput from "../components/auth/AuthInput.jsx";
 import Button from "../components/common/Button.jsx";
 import toast from "react-hot-toast";
-
 export default function ForgotPasswordPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.auth);
-
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = forgotPasswordSchema.safeParse({ email: email.trim() });
@@ -31,7 +28,6 @@ export default function ForgotPasswordPage() {
       toast.error(typeof err === "string" ? err : "Failed to send OTP");
     }
   };
-
   return (
     <div className="min-h-screen w-full flex justify-center items-center bg-[var(--color-background)] p-6">
       <div className="w-full max-w-[420px] bg-[var(--color-surface)] border border-[var(--color-outline-variant)] rounded-lg p-10 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
@@ -41,7 +37,6 @@ export default function ForgotPasswordPage() {
             Enter your email and we'll send you an OTP to reset your password.
           </p>
         </div>
-
         <form onSubmit={handleSubmit} className="flex flex-col gap-[18px]">
           <AuthInput
             id="email"
@@ -57,7 +52,6 @@ export default function ForgotPasswordPage() {
             Send OTP
           </Button>
         </form>
-
         <p className="mt-6 text-center text-sm">
           Remembered your password?{" "}
           <Link to="/login" className="no-underline font-bold text-[var(--color-primary)]">

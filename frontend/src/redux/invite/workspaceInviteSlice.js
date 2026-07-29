@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../axios/axiosInstance";
 import { addToast } from "../toast/toastSlice";
-
 export const fetchIncomingInvites = createAsyncThunk("workspaceInvites/fetchIncoming", async (_, thunkAPI) => {
   try {
     const response = await axiosInstance.get("/invites/incoming");
@@ -12,7 +11,6 @@ export const fetchIncomingInvites = createAsyncThunk("workspaceInvites/fetchInco
     return thunkAPI.rejectWithValue(message);
   }
 });
-
 export const fetchOutgoingInvites = createAsyncThunk("workspaceInvites/fetchOutgoing", async (workspaceId, thunkAPI) => {
   try {
     const response = await axiosInstance.get(`/workspaces/${workspaceId}/invites/outgoing`);
@@ -23,7 +21,6 @@ export const fetchOutgoingInvites = createAsyncThunk("workspaceInvites/fetchOutg
     return thunkAPI.rejectWithValue(message);
   }
 });
-
 export const sendInvite = createAsyncThunk("workspaceInvites/send", async ({ workspaceId, invitedUserId, role }, thunkAPI) => {
   try {
     const response = await axiosInstance.post(`/workspaces/${workspaceId}/invites`, { invitedUserId, role });
@@ -35,7 +32,6 @@ export const sendInvite = createAsyncThunk("workspaceInvites/send", async ({ wor
     return thunkAPI.rejectWithValue(message);
   }
 });
-
 export const acceptInvite = createAsyncThunk("workspaceInvites/accept", async (inviteId, thunkAPI) => {
   try {
     const response = await axiosInstance.patch(`/invites/${inviteId}/accept`);
@@ -47,7 +43,6 @@ export const acceptInvite = createAsyncThunk("workspaceInvites/accept", async (i
     return thunkAPI.rejectWithValue(message);
   }
 });
-
 export const rejectInvite = createAsyncThunk("workspaceInvites/reject", async (inviteId, thunkAPI) => {
   try {
     const response = await axiosInstance.patch(`/invites/${inviteId}/reject`);
@@ -59,7 +54,6 @@ export const rejectInvite = createAsyncThunk("workspaceInvites/reject", async (i
     return thunkAPI.rejectWithValue(message);
   }
 });
-
 export const cancelInvite = createAsyncThunk("workspaceInvites/cancel", async ({ workspaceId, inviteId }, thunkAPI) => {
   try {
     const response = await axiosInstance.patch(`/invites/${inviteId}/cancel`);
@@ -71,7 +65,6 @@ export const cancelInvite = createAsyncThunk("workspaceInvites/cancel", async ({
     return thunkAPI.rejectWithValue(message);
   }
 });
-
 const workspaceInviteSlice = createSlice({
   name: "workspaceInvites",
   initialState: {
@@ -121,7 +114,5 @@ const workspaceInviteSlice = createSlice({
       });
   },
 });
-
 export const { appendIncomingInvite, removeIncomingInvite, removeOutgoingInvite } = workspaceInviteSlice.actions;
-
 export default workspaceInviteSlice.reducer;

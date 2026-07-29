@@ -2,73 +2,104 @@
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-
-  --font-display: 'Plus Jakarta Sans', sans-serif; /* For big headers */
-  --font-mono: 'JetBrains Mono', monospace;         /* For code snippets */
-
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
+  --font-display: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 :root {
-  --color-primary: #ea580c;
-  --color-primary-container: #ffedd5;
-  --color-on-primary-container: #7c2d12;
-  
-  --color-secondary: #f97316;
-  --color-secondary-container: #fff7ed;
-  --color-on-secondary-container: #7c2d12;
-  
-  --color-error: #ef4444;
-  --color-error-container: #fee2e2;
-  --color-on-error-container: #991b1b;
-  
-  --color-background: #ffffff;
-  --color-on-background: #0f172a;
-  
-  --color-surface: #ffffff;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f8fafc;
-  --color-surface-container: #f1f5f9;
-  --color-surface-container-high: #e2e8f0;
-  
-  --color-on-surface: #0f172a;
-  --color-on-surface-variant: #475569;
-  
-  --color-outline: #cbd5e1;
-  --color-outline-variant: #e2e8f0;
+  /* Backgrounds */
+  --color-bg:               #1F1F21;   /* whole-app background  */
+  --color-column-bg:        #18191A;   /* kanban column bg      */
+
+  /* Surfaces (modals, cards, sidebar) */
+  --color-surface:          #1F1F21;
+  --color-surface-low:      #18191A;
+  --color-surface-high:     #2A2B2E;
+  --color-surface-highest:  #313235;
+
+  /* Text */
+  --color-text:             #F0F0F0;   /* smoke-white primary text  */
+  --color-text-muted:       #A8AAAE;   /* secondary / muted         */
+  --color-text-subtle:      #6B6E75;   /* placeholders, captions    */
+
+  /* Accent — buttons */
+  --color-btn:              #669DF1;   /* primary button fill       */
+  /* --color-btn-hover:        #4F87E0;   button hover              */
+  --color-btn-text:         #0A1929;   /* text on primary button    */
+
+  /* Active tab / workspace highlight */
+  --color-active-tab:       #1C2B42;   /* active workspace bg       */
+  --color-active-tab-text:  #669DF1;   /* text on active workspace  */
+
+  /* Hover */
+  /* --color-hover:            rgba(255,255,255,0.06);  light-grey hover overlay */
+
+  /* Profile icon */
+  --color-profile:          #00A3BF;   /* profile avatar bg         */
+  --color-profile-text:     #FFFFFF;   /* initial text on avatar    */
+
+  /* Borders */
+  --color-border:           #2E3035;
+  --color-border-focus:     #669DF1;
+
+  /* Semantic */
+  --color-error:            #FF6B6B;
+  --color-error-bg:         #3D1515;
+  --color-success:          #4CAF8A;
+  --color-warning:          #E6A817;
+
+  /* Legacy aliases so older components keep working */
+  --color-background:              var(--color-bg);
+  --color-on-background:           var(--color-text);
+  --color-on-surface:              var(--color-text);
+  --color-on-surface-variant:      var(--color-text-muted);
+  --color-primary:                 var(--color-btn);
+  --color-primary-container:       var(--color-btn);
+  --color-on-primary:              var(--color-btn-text);
+  --color-on-primary-container:    var(--color-btn-text);
+  --color-secondary:               var(--color-text-muted);
+  --color-secondary-container:     var(--color-active-tab);
+  --color-on-secondary-container:  var(--color-active-tab-text);
+  --color-tertiary-container:      #3A2800;
+  --color-on-tertiary-container:   #E6A817;
+  --color-surface-container-lowest: var(--color-surface-low);
+  --color-surface-container-low:   var(--color-surface-low);
+  --color-surface-container:       var(--color-surface);
+  --color-surface-container-high:  var(--color-surface-high);
+  --color-surface-container-highest:var(--color-surface-highest);
+  --color-surface-variant:         var(--color-surface-high);
+  --color-outline:                 #5A5E68;
+  --color-outline-variant:         var(--color-border);
+  --color-error-container:         var(--color-error-bg);
+  --color-on-error-container:      var(--color-error);
 }
 
+/* ─── Animations ─── */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: .5; }
+  50%       { opacity: .5; }
 }
-.animate-pulse {
-  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
+.animate-pulse { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 
 @keyframes spin {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 }
-.animate-spin {
-  animation: spin 0.8s linear infinite;
-}
+.animate-spin { animation: spin 0.8s linear infinite; }
+
+/* ─── Base ─── */
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background-color: var(--color-background);
-  color: var(--color-on-background);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  font-size: x-large
 }
 
-#root {
-  display: flex;
-  min-height: 100vh;
-  width: 100%;
-}
+#root { display: flex; min-height: 100vh; width: 100%; }
 
 .app-shell {
   display: flex;
@@ -77,68 +108,91 @@ body {
   overflow: hidden;
 }
 
-/* Base component styles */
+/* ─── Scrollbar ─── */
+.scrollbar-thin::-webkit-scrollbar               { width: 5px; height: 5px; }
+.scrollbar-thin::-webkit-scrollbar-track         { background: var(--color-surface-low); }
+.scrollbar-thin::-webkit-scrollbar-thumb         { background: var(--color-border); border-radius: 10px; }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover   { background: var(--color-text-subtle); }
+
+/* ─── Surface layers (replaces layer-1 / layer-2) ─── */
+.layer-1 {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+.layer-2 {
+  background-color: var(--color-surface-high);
+  border: 1px solid var(--color-border);
+}
+
+/* ─── Button ─── */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-weight: 500;
-  border-radius: 4px;
-  transition: all 0.2s;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.15s;
   cursor: pointer;
   border: 1px solid transparent;
+  font-size: 13px;
+  padding: 0 14px;
+  height: 36px;
+  white-space: nowrap;
 }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
+/* solid — uses --color-btn */
 .btn-solid {
-  background-color: var(--color-primary);
-  color: white;
+  background-color: var(--color-btn);
+  color: var(--color-btn-text);
+  border-color: var(--color-btn);
 }
-
 .btn-solid:hover:not(:disabled) {
-  background-color: var(--color-on-primary-container);
+  background-color: var(--color-btn-hover);
+  /* border-color: var(--color-btn-hover); */
 }
 
+/* outline */
 .btn-outline {
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+  background: transparent;
+}
+.btn-outline:hover:not(:disabled) {
+  color: var(--color-text);
 }
 
-.btn-outline:hover {
-  background-color: var(--color-surface-container);
-}
-
+/* danger */
 .btn-danger {
-  background-color: var(--color-error);
-  color: var(--color-on-error);
+  background-color: var(--color-error-bg);
+  color: var(--color-error);
+  border-color: var(--color-error-bg);
 }
 
-.btn-danger:hover {
-  background-color: #b71c1c;
-}
+/* size variants */
+.btn-sm { height: 30px; font-size: 12px; padding: 0 10px; }
+.btn-md { height: 36px; }
+.btn-lg { height: 44px; font-size: 14px; padding: 0 20px; }
 
-/* Premium global styles and smooth transitions */
-* {
-  box-sizing: border-box;
+/* ─── Input baseline ─── */
+.input-base {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--color-surface-low);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.15s;
 }
+.input-base::placeholder  { color: var(--color-text-subtle); }
+.input-base:focus         { border-color: var(--color-border-focus); }
 
+/* ─── Misc ─── */
 input[type="password"]::-ms-reveal,
-input[type="password"]::-ms-clear {
-  display: none;
-}
+input[type="password"]::-ms-clear { display: none; }
 
-/* ── Responsive Utilities ───────────────────────── */
-@media (min-width: 768px) {
-  .mobile-only {
-    display: none !important;
-  }
-}
-
-@media (max-width: 767px) {
-  .desktop-only {
-    display: none !important;
-  }
-}
+@media (min-width: 768px) { .mobile-only  { display: none !important; } }
+@media (max-width: 767px) { .desktop-only { display: none !important; } }

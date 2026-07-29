@@ -1,134 +1,53 @@
-import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../../redux/auth/authThunk.js";
-import { useNavigate } from "react-router-dom";
-import ProfileAvatar from "./ProfileAvatar.jsx";
+import { useDispatch, useSelector } from 'react-redux'
+import { logoutUser } from '../../redux/auth/authThunk.js'
+import { useNavigate } from 'react-router-dom'
+import ProfileAvatar from './ProfileAvatar.jsx'
 
 export default function ProfileCard() {
-    const { user } = useSelector(state => state.auth)
-    const dispatch=useDispatch();
-    const navigate=useNavigate();
+  const { user } = useSelector(state => state.auth)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
-    const handleLogout=()=> {
-      dispatch(logoutUser()).then(() => {
-        
-        navigate('/login', { replace: true })
-      })
-    }
-
-    const  moveToProfilePage=() =>{
-      console.log("navigated ")
-      navigate('/profilePage');
-    }
+  const handleLogout = () => dispatch(logoutUser()).then(() => navigate('/login', { replace: true }))
+  const rowCls = 'w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] text-[var(--color-text-muted)] hover:bg-[var(--color-hover)] hover:text-[var(--color-text)] transition-colors bg-transparent border-none cursor-pointer text-left'
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: "calc(100% + 2px)",
-        right: 0,
-        maxWidth: 280,
-        background: "#fff",
-        border: "1px solid #ddd",
-        borderRadius: 12,
-        boxShadow: "0 10px 30px rgba(0,0,0,.15)",
-        padding: 16,
-        zIndex: 1000,
-      }}
-    >
-      <div
-      onClick={moveToProfilePage}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-        }}
-      >
-        <div
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: "50%",
-            background: "lightgrey",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: "bold",
-            fontSize: 18,
-          }}
-        >
-          <ProfileAvatar size={48}/>
+    <div className="absolute right-0 z-50 !min-w-[20vw] min-h-[10vh] overflow-hidden bg-[#1F1F21] shadow-2xl shadow-white/20"
+         style={{ top: 'calc(100% + 2px)' }}>
+      <div className="flex items-center gap-3 p-4 cursor-pointer hover:bg-[var(--color-hover)] "
+           onClick={() => navigate('/profilePage')}>
+        <div className="rounded-full overflow-hidden shrink-0 border-2 border-[var(--color-profile)]">
+          <ProfileAvatar size={40} />
         </div>
-
-        <div>
-          <div style={{ fontWeight: 600 }}>{user?.name}</div>
-          <div
-            style={{
-              fontSize: 13,
-              color: "#777",
-            }}
-          >
-            @{user?.username}
-          </div>
+        <div className="min-w-0">
+          <p className="m-0 text-[14px] font-semibold text-[var(--color-text)] truncate">{user?.name}</p>
+          <p className="m-0 text-[12px] text-[var(--color-text-subtle)] truncate">@{user?.username}</p>
         </div>
       </div>
 
-      <hr style={{ margin: "16px 0" }} />
+      <hr className="border-t border-[var(--color-border)] " />
 
-      <div style={{ fontSize: 14, marginBottom: 10 }}>
-        {user?.email}
+      <div className="p-2 flex flex-col gap-0.5">
+        <p className="m-0 px-3 py-1 text-[12px] text-[var(--color-text-subtle)] truncate">{user?.email}</p>
+        <div className="flex items-center gap-1.5 px-3 py-1">
+          
+          <span className={`text-[12px] ${user?.isVerified ? 'text-[var(--color-success)]' : 'text-[var(--color-error)]'}`}>
+            {user?.isVerified ? 'Verified' : 'Not Verified'}
+          </span>
+        </div>
       </div>
 
-      <div
-        style={{
-          fontSize: 13,
-          color: user?.isVerified ? "green" : "red",
-          marginBottom: 16,
-        }}
-      >
-        {user?.isVerified ? "✓ Verified" : "✗ Not Verified"}
+      
+
+      <div className="p-2 flex flex-col gap-0.5">
+        <button className={rowCls} onClick={() => navigate('/profilePage')}>
+          
+          My Profile
+        </button>
+        <button className={`${rowCls} text-[var(--color-error)] hover:text-[var(--color-error)]`} onClick={handleLogout}>
+          Logout
+        </button>
       </div>
-
-      <button
-      onClick={moveToProfilePage}
-        style={{
-          width: "100%",
-          padding: 10,
-          border: "none",
-          background: "transparent",
-          textAlign: "left",
-          cursor: "pointer",
-        }}
-      >
-        My Profile
-      </button>
-
-      {/* <button
-        style={{
-          width: "100%",
-          padding: 10,
-          border: "none",
-          background: "transparent",
-          textAlign: "left",
-          cursor: "pointer",
-        }}
-      >
-        Settings
-      </button> */}
-
-      <button
-        onClick={handleLogout}
-        style={{
-          width: "100%",
-          padding: 10,
-          border: "none",
-          background: "transparent",
-          color: "red",
-          textAlign: "left",
-          cursor: "pointer",
-        }}
-      >
-        Logout
-      </button>
     </div>
-  );
+  )
 }

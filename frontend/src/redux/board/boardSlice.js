@@ -4,6 +4,9 @@ import toast from "react-hot-toast";
 import { createColumn, updateColumn, deleteColumn } from "../column/columnSlice";
 import { createTask, updateTask, deleteTask } from "../task/taskSlice";
 
+// DnD operation queue to prevent race conditions
+const dndOperations = new Map();
+
 export const fetchBoards = createAsyncThunk("boards/fetchByWorkspace", async (workspaceId, thunkAPI) => {
   try {
     const response = await axiosInstance.get(`/boards?workspaceId=${workspaceId}`);
@@ -72,9 +75,25 @@ const boardSlice = createSlice({
   },
   reducers: {
     moveTaskOptimistically: (state, action) => {
-      const { taskId, fromColumnId, toColumnId } = action.payload;
+      const { taskId, fromColumnId, toColumnId, operationId: providedOperationId } = action.payload;
+      
       if (state.currentBoard && state.currentBoard.columns) {
-        state.lastColumnsBackup = JSON.parse(JSON.stringify(state.currentBoard.columns));
+        // Create a unique ID for this operation to track it in the queue
+        const operationId = providedOperationId || `${taskId}-${Date.now()}`;
+        const operationState = JSON.parse(JSON.stringify(state.currentBoard.columns));
+        
+        // Store operation metadata for tracking
+        dndOperations.set(operationId, {
+          taskId,
+          operationState,
+          timestamp: Date.now()
+        });
+        
+        // Keep only last 5 operations to prevent memory leaks
+        if (dndOperations.size > 5) {
+          const oldestId = dndOperations.keys().next().value;
+          dndOperations.delete(oldestId);
+        }
         
         let foundTask = null;
         state.currentBoard.columns = state.currentBoard.columns.map(col => {
@@ -92,7 +111,8 @@ const boardSlice = createSlice({
           foundTask.columnId = toColumnId;
           state.currentBoard.columns = state.currentBoard.columns.map(col => {
             if (col.id === toColumnId) {
-              const updatedTasks = [...(col.tasks || []), foundTask];
+              const updatedTasks = [...(col.tasks || [])];
+              updatedTasks.push(foundTask);
               return {
                 ...col,
                 tasks: updatedTasks
@@ -103,14 +123,25 @@ const boardSlice = createSlice({
         }
       }
     },
-    rollbackMoveTask: (state) => {
-      if (state.currentBoard && state.lastColumnsBackup) {
+    rollbackMoveTask: (state, action) => {
+      const { operationId } = action.payload;
+      if (operationId && dndOperations.has(operationId)) {
+        const operation = dndOperations.get(operationId);
+        if (state.currentBoard && operation.operationState) {
+          state.currentBoard.columns = operation.operationState;
+        }
+        dndOperations.delete(operationId);
+      } else if (state.currentBoard && state.lastColumnsBackup) {
         state.currentBoard.columns = state.lastColumnsBackup;
         state.lastColumnsBackup = null;
       }
     },
     clearMoveBackup: (state) => {
       state.lastColumnsBackup = null;
+    },
+    clearDndOperation: (state, action) => {
+      const { operationId } = action.payload;
+      dndOperations.delete(operationId);
     }
   },
   extraReducers: (builder) => {
@@ -235,9 +266,23 @@ const boardSlice = createSlice({
       .addCase(updateTask.rejected, (state, action) => {
         // Roll back optimistic DnD move on failure
         const isDnd = action.meta?.arg?.data?.isDnd === true;
-        if (isDnd && state.currentBoard && state.lastColumnsBackup) {
-          state.currentBoard.columns = state.lastColumnsBackup;
-          state.lastColumnsBackup = null;
+        
+        if (isDnd && state.currentBoard) {
+          // Try to get the operation ID from the meta
+          const operationId = action.meta?.arg?.data?.operationId;
+          
+          if (operationId && dndOperations.has(operationId)) {
+            // Use the stored operation state for rollback
+            const operation = dndOperations.get(operationId);
+            if (operation && operation.operationState) {
+              state.currentBoard.columns = operation.operationState;
+            }
+            dndOperations.delete(operationId);
+          } else if (state.lastColumnsBackup) {
+            // Fallback to lastColumnsBackup if operationId not available
+            state.currentBoard.columns = state.lastColumnsBackup;
+            state.lastColumnsBackup = null;
+          }
         }
       })
       .addCase(deleteTask.fulfilled, (state, action) => {
@@ -252,6 +297,6 @@ const boardSlice = createSlice({
   },
 });
 
-export const { moveTaskOptimistically, rollbackMoveTask, clearMoveBackup } = boardSlice.actions;
+export const { moveTaskOptimistically, rollbackMoveTask, clearMoveBackup, clearDndOperation } = boardSlice.actions;
 
 export default boardSlice.reducer;

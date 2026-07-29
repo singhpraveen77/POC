@@ -1,91 +1,41 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { removeToast } from '../../redux/toast/toastSlice';
-import { useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { useSelector, useDispatch } from 'react-redux'
+import { removeToast } from '../../redux/toast/toastSlice'
+import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
-const Toast = ({ id, message, type, onClose }) => {
+const TYPE_CLS = {
+  success: 'bg-[var(--color-success)] text-white',
+  error:   'bg-[var(--color-error-bg)] text-[var(--color-error)]',
+  warning: 'bg-[var(--color-surface-high)] text-[var(--color-warning)]',
+  info:    'bg-[var(--color-btn)] text-[var(--color-btn-text)]',
+}
+
+function Toast({ id, message, type, onClose }) {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose(id);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [id, onClose]);
-
-  const bgColors = {
-    info: 'var(--color-primary-container)',
-    success: 'var(--color-secondary-container)',
-    error: 'var(--color-error-container)',
-    warning: 'var(--color-surface-variant)',
-  };
-
-  const textColors = {
-    info: 'var(--color-on-primary-container)',
-    success: 'var(--color-on-secondary-container)',
-    error: 'var(--color-on-error-container)',
-    warning: 'var(--color-on-surface-variant)',
-  };
+    const t = setTimeout(() => onClose(id), 3000)
+    return () => clearTimeout(t)
+  }, [id, onClose])
 
   return (
-    <div
-      style={{
-        backgroundColor: bgColors[type] || bgColors.info,
-        color: textColors[type] || textColors.info,
-        padding: '12px 20px',
-        borderRadius: '8px',
-        marginBottom: '10px',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        minWidth: '250px',
-        fontSize: '14px',
-        fontWeight: '500',
-      }}
-    >
+    <div className={`flex items-center justify-between gap-4 px-4 py-3 rounded-lg shadow-lg min-w-[240px] text-[13.5px] font-medium ${TYPE_CLS[type] || TYPE_CLS.info}`}>
       <span>{message}</span>
-      <button
-        onClick={() => onClose(id)}
-        style={{
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          marginLeft: '15px',
-          color: 'inherit',
-          opacity: 0.7,
-        }}
-      >
-        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>close</span>
+      <button onClick={() => onClose(id)} className="bg-transparent border-none cursor-pointer opacity-70 hover:opacity-100 text-inherit">
+        <span className="material-symbols-outlined text-[17px]">close</span>
       </button>
     </div>
-  );
-};
+  )
+}
 
 export default function ToastContainer() {
-  const toasts = useSelector((state) => state.toast.toasts);
-  const dispatch = useDispatch();
+  const toasts = useSelector(state => state.toast.toasts)
+  const dispatch = useDispatch()
+  const handleClose = id => dispatch(removeToast(id))
 
-  const handleClose = (id) => {
-    dispatch(removeToast(id));
-  };
-
-  if (toasts.length === 0) return null;
-
+  if (!toasts.length) return null
   return createPortal(
-    <div
-      style={{
-        position: 'fixed',
-        bottom: '24px',
-        right: '24px',
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-      }}
-    >
-      {toasts.map((toast) => (
-        <Toast key={toast.id} {...toast} onClose={handleClose} />
-      ))}
+    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-2">
+      {toasts.map(t => <Toast key={t.id} {...t} onClose={handleClose} />)}
     </div>,
     document.body
-  );
+  )
 }

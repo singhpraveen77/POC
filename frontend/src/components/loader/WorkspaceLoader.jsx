@@ -1,16 +1,6 @@
 export const WorkspaceSkeleton = () => (
-  <div className="animate-pulse" style={{
-    padding: 24,
-    backgroundColor: "var(--color-surface-container-low)",
-    border: "1px solid var(--color-outline-variant)",
-    borderRadius: "8px",
-    height: "108px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px"
-  }}>
-    this is thisjaoisf;af;
-    <div style={{ height: 18, backgroundColor: "var(--color-surface-container-high)", borderRadius: 4, width: "60%" }}></div>
-    <div style={{ height: 14, backgroundColor: "var(--color-surface-container-high)", borderRadius: 4, width: "40%" }}></div>
+  <div className="animate-pulse p-6 rounded-lg h-[108px] flex flex-col gap-3 bg-[var(--color-surface-low)] border border-[var(--color-border)]">
+    <div className="h-4 rounded bg-[var(--color-surface-high)] w-3/5" />
+    <div className="h-3 rounded bg-[var(--color-surface-high)] w-2/5" />
   </div>
-);
+)

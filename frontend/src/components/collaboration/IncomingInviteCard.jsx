@@ -2,12 +2,10 @@ import { useDispatch } from "react-redux";
 import { acceptInvite, rejectInvite } from "../../redux/invite/workspaceInviteSlice";
 import RoleBadge from "./RoleBadge";
 import Button from "../common/Button";
-
 export default function IncomingInviteCard({ invite }) {
   const dispatch = useDispatch();
-
   return (
-    <div className="border border-[var(--color-outline-variant)] rounded-lg p-4 flex items-center gap-3 bg-[var(--color-surface)]">
+    <div className="border border-[var(--color-outline-variant)]  p-4 flex items-center gap-3 bg-[var(--color-surface)]">
       <div className="flex-1 min-w-0">
         <p className="font-bold text-[15px] mt-0 mb-0.5 text-[var(--color-on-surface)]">
           {invite.workspace.name}
@@ -17,7 +15,6 @@ export default function IncomingInviteCard({ invite }) {
         </p>
         <RoleBadge role={invite.role} />
       </div>
-
       <div className="flex gap-2 flex-shrink-0">
         <Button variant="solid" size="sm" onClick={() => dispatch(acceptInvite(invite.id))}>
           Accept

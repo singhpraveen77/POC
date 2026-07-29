@@ -1,30 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
 import Input from "../common/Input.jsx";
 import Button from "../common/Button.jsx";
-
 import ProfileAvatar from "./ProfileAvatar.jsx";
 import ProfileInfoCard from "./ProfileInfoCard.jsx";
-
 import { updateProfile, uploadProfileImage } from "../../redux/profile/profileThunk.js";
 import { updateProfileSchema } from "../../validators/profileValidation.js";
-
 export default function EditProfileForm({ user }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const { loading } = useSelector((state) => state.profile);
-
   const [formData, setFormData] = useState({
     name: "",
     username: "",
     email: "",
   });
-
   const [errors, setErrors] = useState({});
-
   useEffect(() => {
     if (user) {
       setFormData({
@@ -34,81 +26,60 @@ export default function EditProfileForm({ user }) {
       });
     }
   }, [user]);
-
 const handleChange = (e) => {
   setErrors((prev) => ({
     ...prev,
     [e.target.name]: "",
   }));
-
   setFormData((prev) => ({
     ...prev,
     [e.target.name]: e.target.value,
   }));
 };
-
 const fileInputRef = useRef(null);
-
 const handleUploadClick = () => {
   fileInputRef.current.click();
 };
-
-
 const handleSubmit = async (e) => {
   e.preventDefault();
   console.log("handle edit page is called !!")
-
   const result = updateProfileSchema.safeParse(formData);
-
   if (!result.success) {
     const formattedErrors = {};
-
     result.error.issues.forEach((err) => {
       formattedErrors[err.path[0]] = err.message;
     });
-
     setErrors(formattedErrors);
     return;
   }
-
   setErrors({});
-
   try {
     await dispatch(updateProfile(result.data)).unwrap();
-
     navigate("/profilePage");
   } catch (error) {
     console.error(error);
   }
 };
-
 const handleFileChange = (e) => {
   const file = e.target.files[0];
   console.log("file: ",file);
-
   if (!file) return;
-
   const formData = new FormData();
   formData.append("file", file);
-
   dispatch(
     uploadProfileImage(
       formData,
     )
   );
 };
-
   return (
     <ProfileInfoCard
-    
       title="Edit Profile"
       subtitle="Update your personal information."
     >
       <div className="w-full flex justify-center">
         <ProfileAvatar size={100} />
       </div>
-      
-
       <label>
         <button
         onClick={handleUploadClick}
@@ -116,7 +87,6 @@ const handleFileChange = (e) => {
          type="button">
           Upload
         </button>
-
         <input
          onChange={handleFileChange}
             ref={fileInputRef}
@@ -124,15 +94,9 @@ const handleFileChange = (e) => {
             hidden
         />
       </label>
-
       <form
         onSubmit={handleSubmit}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "20px",
-          marginTop: "24px",
-        }}
+        className="flex flex-col gap-5 mt-6"
       >
         <Input
           id="name"
@@ -143,7 +107,6 @@ const handleFileChange = (e) => {
           onChange={handleChange}
           error={errors.name}
         />
-
         <Input
           id="username"
           name="username"
@@ -153,41 +116,9 @@ const handleFileChange = (e) => {
           onChange={handleChange}
           error={errors.username}
         />
-
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          label="Email"
-          placeholder="Enter email"
-          value={formData.email}
-          onChange={handleChange}
-          error={errors.email}
-        />
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "12px",
-            marginTop: "12px",
-          }}
-        >
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => navigate("/profilePage")}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            variant="solid"
-            type="submit"
-            loading={loading}
-          >
-            Save Changes
-          </Button>
+        <div className="flex justify-end gap-3 mt-3">
+          <Button variant="outline" type="button" onClick={() => navigate("/profilePage")}>Cancel</Button>
+          <Button variant="solid" type="submit" loading={loading}>Save Changes</Button>
         </div>
       </form>
     </ProfileInfoCard>

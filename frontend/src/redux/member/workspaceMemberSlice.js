@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../axios/axiosInstance";
 import toast from "react-hot-toast";
-
 export const fetchMembers = createAsyncThunk("workspaceMembers/fetch", async (workspaceId, thunkAPI) => {
   try {
     const response = await axiosInstance.get(`/workspaces/${workspaceId}/members`);
@@ -12,7 +11,6 @@ export const fetchMembers = createAsyncThunk("workspaceMembers/fetch", async (wo
     return thunkAPI.rejectWithValue(message);
   }
 });
-
 export const changeMemberRole = createAsyncThunk("workspaceMembers/changeRole", async ({ workspaceId, userId, role }, thunkAPI) => {
   try {
     const response = await axiosInstance.patch(`/workspaces/${workspaceId}/members/${userId}/role`, { role });
@@ -24,7 +22,6 @@ export const changeMemberRole = createAsyncThunk("workspaceMembers/changeRole", 
     return thunkAPI.rejectWithValue(message);
   }
 });
-
 export const removeMember = createAsyncThunk("workspaceMembers/remove", async ({ workspaceId, userId }, thunkAPI) => {
   try {
     await axiosInstance.delete(`/workspaces/${workspaceId}/members/${userId}`);
@@ -36,7 +33,6 @@ export const removeMember = createAsyncThunk("workspaceMembers/remove", async ({
     return thunkAPI.rejectWithValue(message);
   }
 });
-
 const workspaceMemberSlice = createSlice({
   name: "workspaceMembers",
   initialState: {
@@ -81,7 +77,5 @@ const workspaceMemberSlice = createSlice({
       });
   },
 });
-
 export const { upsertMember, removeMemberById } = workspaceMemberSlice.actions;
-
 export default workspaceMemberSlice.reducer;

@@ -115,7 +115,7 @@ export default function VerifyEmailCodePage() {
                 onChange={(e) => handleOtpChange(e.target.value, idx)}
                 onKeyDown={(e) => handleKeyDown(e, idx)}
                 className={[
-                  "w-11 h-[46px] text-[20px] font-bold text-center border-[1.5px] rounded-[6px] outline-none bg-[var(--color-surface)] text-[var(--color-on-surface)] focus:border-orange-500",
+                  "w-11 h-[46px] text-[20px] font-bold text-center border-[1.5px] rounded-[6px] outline-none bg-[var(--color-surface)] text-[var(--color-on-surface)] focus:border-[var(--color-border-focus)]",
                   otpError || error ? "border-[var(--color-error)]" : "border-[var(--color-outline)]"
                 ].join(" ")}
               />

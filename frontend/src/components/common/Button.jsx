@@ -13,40 +13,26 @@ export default function Button({
   children,
   ...rest
 }) {
-  const classes = ['btn', `btn-${variant}`, `btn-${size}`, className]
-    .filter(Boolean)
-    .join(' ')
-
-  const spinnerColor = variant === 'solid' || variant === 'danger' ? '#ffffff' : 'var(--color-primary)'
+  const base = ['btn', `btn-${size}`, className].filter(Boolean).join(' ')
+  const iconSize = size === 'sm' ? 'text-[16px]' : 'text-[20px]'
+  const spinColor = variant === 'solid' || variant === 'danger' ? '#ffffff' : '#669DF1'
 
   return (
     <button
       type={type}
       disabled={disabled || loading}
       onClick={onClick}
-      className={classes}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "8px",
-        padding: "0 0.5rem",
-        cursor: disabled || loading ? "not-allowed" : "pointer",
-      }}      {...rest}
-          >
+      className={`${base} inline-flex !border !border-amber-50 items-center gap-2`}
+      {...rest}
+    >
       {loading ? (
-        <TailSpin height="16" width="16" color={spinnerColor} ariaLabel="loading" />
+        <TailSpin height="16" width="16" color={spinColor} ariaLabel="loading" />
       ) : (
-        icon && (
-          <span className="material-symbols-outlined" style={{ fontSize: size === 'sm' ? 16 : 20 }}>
-            {icon}
-          </span>
-        )
+        icon && <span className={`material-symbols-outlined ${iconSize}`}>{icon}</span>
       )}
       <span>{children}</span>
       {!loading && iconAfter && (
-        <span className="material-symbols-outlined" style={{ fontSize: size === 'sm' ? 16 : 20 }}>
-          {iconAfter}
-        </span>
+        <span className={`material-symbols-outlined ${iconSize}`}>{iconAfter}</span>
       )}
     </button>
   )

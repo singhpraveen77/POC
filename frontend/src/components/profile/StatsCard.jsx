@@ -1,8 +1,8 @@
 export default function StatsCard({ title, value }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 flex flex-col gap-2 min-h-[100px] justify-center">
-      <span className="text-sm text-gray-500 font-medium">{title}</span>
-      <span className="text-[32px] font-bold text-gray-900">{value}</span>
+    <div className="rounded-xl p-5 flex flex-col gap-2 min-h-[90px] justify-center bg-[var(--color-surface-low)] border border-[var(--color-border)]">
+      <span className="text-xs font-medium uppercase tracking-wide text-[var(--color-text-muted)]">{title}</span>
+      <span className="text-[30px] font-bold">{value}</span>
     </div>
-  );
+  )
 }

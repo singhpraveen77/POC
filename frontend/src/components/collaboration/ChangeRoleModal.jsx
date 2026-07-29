@@ -3,27 +3,20 @@ import { useDispatch } from 'react-redux'
 import Modal from '../common/Modal'
 import Button from '../common/Button'
 import { changeMemberRole } from '../../redux/member/workspaceMemberSlice'
-
 export default function ChangeRoleModal({ member, workspaceId, isOpen, onClose }) {
   const dispatch = useDispatch()
   const [role, setRole] = useState(member?.role || 'MEMBER')
-
   const handleSubmit = (e) => {
     e.preventDefault()
     dispatch(changeMemberRole({ workspaceId, userId: member.userId, role }))
     onClose()
   }
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Change Role">
       <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-5">
         <div className="flex flex-col gap-1.5">
-          <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Role</label>
-          <select
-            value={role}
-            onChange={e => setRole(e.target.value)}
-            className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-sm outline-none bg-[var(--color-surface)] focus:border-orange-500"
-          >
+          <label className="text-[13px] font-semibold text-[var(--color-text)]">Role</label>
+          <select value={role} onChange={e => setRole(e.target.value)} className="input-base text-[var(--color-text)] bg-[var(--color-surface-low)] border-[var(--color-border)] focus:border-[var(--color-btn)]">
             <option value="ADMIN">ADMIN</option>
             <option value="MEMBER">MEMBER</option>
             <option value="VIEWER">VIEWER</option>

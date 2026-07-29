@@ -1,12 +1,10 @@
 import { z } from "zod";
-
 export const updateProfileSchema = z.object({
   name: z
     .string()
     .trim()
     .min(3, "Name must be at least 3 characters")
     .max(50, "Name cannot exceed 50 characters"),
-
   username: z
     .string()
     .trim()
@@ -16,7 +14,6 @@ export const updateProfileSchema = z.object({
       /^[a-zA-Z0-9_]+$/,
       "Only letters, numbers and underscore are allowed"
     ),
-
   email: z
     .string()
     .trim()

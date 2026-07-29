@@ -6,19 +6,15 @@ import { resetPasswordSchema } from "../validators/auth.validators.js";
 import AuthInput from "../components/auth/AuthInput.jsx";
 import Button from "../components/common/Button.jsx";
 import toast from "react-hot-toast";
-
 export default function ResetPasswordPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { state } = useLocation();
   const { loading } = useSelector((s) => s.auth);
-
   const email = state?.email || "";
   const otp = state?.otp || "";
-
   const [fields, setFields] = useState({ newPassword: "", confirmPassword: "" });
   const [errors, setErrors] = useState({});
-
   if (!email || !otp) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -29,7 +25,6 @@ export default function ResetPasswordPage() {
       </div>
     );
   }
-
   const update = (key) => (e) => {
     const updated = { ...fields, [key]: e.target.value };
     setFields(updated);
@@ -42,7 +37,6 @@ export default function ResetPasswordPage() {
     }
     setErrors(errs);
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = resetPasswordSchema.safeParse({ email, otp, ...fields });
@@ -61,7 +55,6 @@ export default function ResetPasswordPage() {
       toast.error(typeof err === "string" ? err : "Failed to reset password");
     }
   };
-
   return (
     <div className="min-h-screen w-full flex justify-center items-center bg-[var(--color-background)] p-6">
       <div className="w-full max-w-[420px] bg-[var(--color-surface)] border border-[var(--color-outline-variant)] rounded-lg p-10 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
@@ -71,7 +64,6 @@ export default function ResetPasswordPage() {
             Create a strong password for <strong>{email}</strong>
           </p>
         </div>
-
         <form onSubmit={handleSubmit} className="flex flex-col gap-[18px]">
           <AuthInput
             id="newPassword"
@@ -96,7 +88,6 @@ export default function ResetPasswordPage() {
             Reset Password
           </Button>
         </form>
-
         <p className="mt-6 text-center text-sm">
           <Link to="/login" className="no-underline text-[var(--color-on-surface-variant)]">
             ← Back to Sign In

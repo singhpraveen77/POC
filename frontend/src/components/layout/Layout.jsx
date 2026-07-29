@@ -8,16 +8,10 @@ export default function Layout() {
 
   return (
     <div className="app-shell">
-      <Sidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
-
-      {/* Right column: navbar + page content */}
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, overflow: 'hidden', height: '100%' }}>
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden h-full">
         <Navbar onMenuToggle={() => setSidebarOpen(prev => !prev)} />
-        {/* Page area — fills remaining height */}
-        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
+        <div className="flex flex-col flex-1 min-h-0 overflow-x-hidden">
           <Outlet />
         </div>
       </div>

@@ -1,254 +1,152 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchWorkspaces, createWorkspace, updateWorkspace, deleteWorkspace } from "../redux/workspace/workspaceSlice.js";
-import { useNavigate } from "react-router-dom";
-import Button from "../components/common/Button.jsx";
-import Modal from "../components/common/Modal.jsx";
-import { extractFieldErrors } from "../utils/errorHelper.js";
-import toast from "react-hot-toast";
-import { WorkspaceSkeleton } from "../components/loader/WorkspaceLoader.jsx";
-import RoleBadge from "../components/collaboration/RoleBadge.jsx";
-import { validateWorkspace, hasErrors } from "../utils/validators.js";
-
-
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchWorkspaces, createWorkspace, updateWorkspace, deleteWorkspace } from '../redux/workspace/workspaceSlice.js'
+import { useNavigate } from 'react-router-dom'
+import Button from '../components/common/Button.jsx'
+import { extractFieldErrors } from '../utils/errorHelper.js'
+import { WorkspaceSkeleton } from '../components/loader/WorkspaceLoader.jsx'
+import { validateWorkspace, hasErrors } from '../utils/validators.js'
+import WorkspaceItem from '../components/workspace/WorkspaceItem.jsx'
+import WorkspaceFormModal from '../components/workspace/WorkspaceFormModal.jsx'
 
 export default function WorkspaceList() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { items, status } = useSelector((state) => state.workspaces);
-  const currentUser = useSelector((state) => state.auth.user);
-  
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [createErrors, setCreateErrors] = useState({});
-  const [isSubmittingCreate, setIsSubmittingCreate] = useState(false);
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const { items, status } = useSelector(state => state.workspaces)
+  const currentUser = useSelector(state => state.auth.user)
 
-  const [editingWorkspace, setEditingWorkspace] = useState(null);
-  const [editName, setEditName] = useState("");
-  const [editSlug, setEditSlug] = useState("");
-  const [editErrors, setEditErrors] = useState({});
-  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
+  // ── Create state ──
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [name, setName] = useState('')
+  const [slug, setSlug] = useState('')
+  const [createErrors, setCreateErrors] = useState({})
+  const [isSubmittingCreate, setIsSubmittingCreate] = useState(false)
+
+  // ── Edit state ──
+  const [editingWorkspace, setEditingWorkspace] = useState(null)
+  const [editName, setEditName] = useState('')
+  const [editSlug, setEditSlug] = useState('')
+  const [editErrors, setEditErrors] = useState({})
+  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false)
 
   useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchWorkspaces());
-    }
-  }, [status, dispatch]);
+    if (status === 'idle') dispatch(fetchWorkspaces())
+  }, [status, dispatch])
 
   const handleCreate = (e) => {
-    e.preventDefault();
-    const clientErrors = validateWorkspace({ name, slug });
-    if (hasErrors(clientErrors)) { setCreateErrors(clientErrors); return; }
-    setCreateErrors({});
-    setIsSubmittingCreate(true);
-
+    e.preventDefault()
+    const errs = validateWorkspace({ name, slug })
+    if (hasErrors(errs)) { setCreateErrors(errs); return }
+    setCreateErrors({})
+    setIsSubmittingCreate(true)
     dispatch(createWorkspace({ name, slug }))
       .unwrap()
-      .then(() => {
-        setIsCreateOpen(false);
-        setName("");
-        setSlug("");
-      })
-      .catch((err) => {
-        // Field-level errors
-        const fields = extractFieldErrors(err);
-        setCreateErrors(fields);
-      })
-      .finally(() => {
-        setIsSubmittingCreate(false);
-      });
-  };
+      .then(() => { setIsCreateOpen(false); setName(''); setSlug('') })
+      .catch(err => setCreateErrors(extractFieldErrors(err)))
+      .finally(() => setIsSubmittingCreate(false))
+  }
 
-  const handleEditClick = (ws, e) => {
-    e.stopPropagation();
-    setEditingWorkspace(ws);
-    setEditName(ws.name);
-    setEditSlug(ws.slug);
-    setEditErrors({});
-  };
+  const openEdit = (ws, e) => {
+    e.stopPropagation()
+    setEditingWorkspace(ws)
+    setEditName(ws.name)
+    setEditSlug(ws.slug)
+    setEditErrors({})
+  }
 
   const handleUpdate = (e) => {
-    e.preventDefault();
-    const clientErrors = validateWorkspace({ name: editName, slug: editSlug });
-    if (hasErrors(clientErrors)) { setEditErrors(clientErrors); return; }
-    setEditErrors({});
-    setIsSubmittingEdit(true);
-
+    e.preventDefault()
+    const errs = validateWorkspace({ name: editName, slug: editSlug })
+    if (hasErrors(errs)) { setEditErrors(errs); return }
+    setEditErrors({})
+    setIsSubmittingEdit(true)
     dispatch(updateWorkspace({ id: editingWorkspace.id, data: { name: editName, slug: editSlug } }))
       .unwrap()
-      .then(() => {
-        setEditingWorkspace(null);
-        setEditName("");
-        setEditSlug("");
-      })
-      .catch((err) => {
-        const fields = extractFieldErrors(err);
-        setEditErrors(fields);
-      })
-      .finally(() => {
-        setIsSubmittingEdit(false);
-      });
-  };
+      .then(() => { setEditingWorkspace(null) })
+      .catch(err => setEditErrors(extractFieldErrors(err)))
+      .finally(() => setIsSubmittingEdit(false))
+  }
 
-  const handleDeleteClick = (ws, e) => {
-    e.stopPropagation();
-    if (window.confirm(`Are you sure you want to delete workspace "${ws.name}"? All associated boards and tasks will be permanently removed.`)) {
-      dispatch(deleteWorkspace(ws.id));
+  const handleDelete = (ws, e) => {
+    e.stopPropagation()
+    if (window.confirm(`Delete workspace "${ws.name}"? This is permanent.`)) {
+      dispatch(deleteWorkspace(ws.id))
     }
-  };
+  }
 
   return (
-    <div className="px-6 py-10 max-w-[1000px] mx-auto">
+    <div className="px-6 py-10 max-w-full">
+      {}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-display-md text-[var(--color-on-surface)] m-0 font-extrabold">Workspaces</h1>
-          <p className="text-[var(--color-on-surface-variant)] mt-1 mb-0 text-sm">Create and manage collaborative spaces for your projects.</p>
+          <h1 className="text-[22px] font-extrabold m-0 ">Workspaces</h1>
+          <p className="mt-1 mb-0 text-sm m-0 ">
+            Create and manage collaborative spaces for your projects.
+          </p>
         </div>
-        <Button variant="solid" onClick={() => setIsCreateOpen(true)} icon="add">Create Workspace</Button>
+        <Button variant="solid" icon="add" onClick={() => setIsCreateOpen(true)}/>
       </div>
 
-      {status === "loading" && items.length === 0 ? (
-        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
-          <WorkspaceSkeleton />
-          <WorkspaceSkeleton />
-          <WorkspaceSkeleton />
+      {}
+      {status === 'loading' && items.length === 0 ? (
+        <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+          <WorkspaceSkeleton /><WorkspaceSkeleton /><WorkspaceSkeleton />
         </div>
       ) : (
-        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
-          {items.map((ws) => {
-            const myMembership = ws.members?.find((m) => m.userId === currentUser?.id);
-            const myRole = myMembership?.role;
-            const canManage = myRole === "OWNER" || myRole === "ADMIN";
-
+        <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+          {items.map(ws => {
+            const myRole = ws.members?.find(m => m.userId === currentUser?.id)?.role
+            const canManage = myRole === 'OWNER' || myRole === 'ADMIN'
             return (
-            <div
-              key={ws.id}
-              onClick={() => navigate(`/workspaces/${ws.id}`)}
-              className="p-6 bg-[var(--color-surface)] border border-[var(--color-outline-variant)] rounded-lg cursor-pointer flex justify-between items-start transition-all duration-200 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-gray-300"
-            >
-              <div className="flex-1 min-w-0 pr-4">
-                <h2 className="text-[17px] font-bold mt-0 mb-1 text-[var(--color-on-surface)] overflow-y-auto text-ellipsis whitespace-nowrap">
-                  {ws.name}
-                </h2>
-                <p className="text-[13px] text-[var(--color-on-surface-variant)] mt-0 mb-2 overflow-y-auto text-ellipsis whitespace-nowrap">
-                  {ws.slug}
-                </p>
-                {myRole && <RoleBadge role={myRole} />}
-              </div>
-              
-              {canManage && (
-              <div className="flex gap-1 flex-shrink-0">
-                <button
-                  type="button"
-                  onClick={(e) => handleEditClick(ws, e)}
-                  className="border-none bg-transparent cursor-pointer p-1 flex rounded text-[var(--color-on-surface-variant)] hover:bg-slate-100 hover:text-orange-600"
-                  title="Edit Workspace"
-                >
-                  <span className="material-symbols-outlined text-[18px]">edit</span>
-                </button>
-                {myRole === "OWNER" && (
-                <button
-                  type="button"
-                  onClick={(e) => handleDeleteClick(ws, e)}
-                  className="border-none bg-transparent cursor-pointer p-1 flex rounded text-[var(--color-on-surface-variant)] hover:bg-red-50 hover:text-red-600"
-                  title="Delete Workspace"
-                >
-                  <span className="material-symbols-outlined text-[18px]">delete</span>
-                </button>
-                )}
-              </div>
-              )}
-            </div>
-            );
+              <WorkspaceItem
+                key={ws.id}
+                workspace={ws}
+                myRole={myRole}
+                canManage={canManage}
+                onClick={() => navigate(`/workspaces/${ws.id}`)}
+                onEdit={e => openEdit(ws, e)}
+                onDelete={e => handleDelete(ws, e)}
+              />
+            )
           })}
 
           {items.length === 0 && (
-            <div className="col-span-full py-12 px-6 text-center border-2 border-dashed border-[var(--color-outline-variant)] rounded-lg text-[var(--color-on-surface-variant)]">
-              <span className="material-symbols-outlined text-[48px] text-[var(--color-outline)] mb-3 block">folder_open</span>
-              <p className="text-base font-semibold mt-0 mb-1">No workspaces found</p>
-              <p className="text-sm mt-0 mb-4 text-[var(--color-on-surface-variant)]">Get started by creating your first workspace.</p>
-              <Button variant="solid" onClick={() => setIsCreateOpen(true)} icon="add">Create Workspace</Button>
+            <div className="col-span-full py-12 px-6 text-center rounded-xl"
+                 style={{ border: '2px dashed var(--color-border)' }}>
+              <span className="material-symbols-outlined text-[48px] mb-3 block text-[var(--color-text-subtle)]">folder_open</span>
+              <p className="text-[15px] font-semibold mt-0 mb-1 text-[var(--color-text-muted)]">No workspaces found</p>
+              <p className="text-sm mt-0 mb-4 text-[var(--color-text-subtle)]">Get started by creating your first workspace.</p>
+              <Button variant="solid" icon="add" onClick={() => setIsCreateOpen(true)}>Create Workspace</Button>
             </div>
           )}
         </div>
       )}
 
-      {/* Create Modal */}
-      <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create Workspace">
-        <form onSubmit={handleCreate} className="p-6 flex flex-col gap-5">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Workspace Name *</label>
-            <input 
-              required 
-              placeholder="e.g. Engineering Team" 
-              value={name} 
-              onChange={e => setName(e.target.value)} 
-              className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-sm outline-none focus:border-orange-500"
-            />
-            {createErrors.name && (
-              <span className="text-xs text-[var(--color-error)] font-medium">{createErrors.name}</span>
-            )}
-          </div>
+      {}
+      <WorkspaceFormModal
+        isOpen={isCreateOpen}
+        onClose={() => { setIsCreateOpen(false); setName(''); setSlug(''); setCreateErrors({}) }}
+        title="Create Workspace"
+        name={name} onNameChange={setName}
+        slug={slug} onSlugChange={setSlug}
+        errors={createErrors}
+        isSubmitting={isSubmittingCreate}
+        onSubmit={handleCreate}
+        submitLabel="Create"
+      />
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Workspace Slug *</label>
-            <input 
-              required 
-              placeholder="e.g. engineering-team" 
-              value={slug} 
-              onChange={e => setSlug(e.target.value)}
-              className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-sm outline-none focus:border-orange-500"
-            />
-            {createErrors.slug && (
-              <span className="text-xs text-[var(--color-error)] font-medium">{createErrors.slug}</span>
-            )}
-          </div>
-
-          <div className="flex justify-end gap-3 mt-2">
-            <Button variant="outline" onClick={() => setIsCreateOpen(false)} type="button">Cancel</Button>
-            <Button variant="solid" type="submit" loading={isSubmittingCreate}>Create</Button>
-          </div>
-        </form>
-      </Modal>
-
-      {/* Edit Modal */}
-      <Modal isOpen={!!editingWorkspace} onClose={() => setEditingWorkspace(null)} title="Edit Workspace">
-        <form onSubmit={handleUpdate} className="p-6 flex flex-col gap-5">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Workspace Name *</label>
-            <input 
-              required 
-              placeholder="e.g. Engineering Team" 
-              value={editName} 
-              onChange={e => setEditName(e.target.value)} 
-              className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-sm outline-none focus:border-orange-500"
-            />
-            {editErrors.name && (
-              <span className="text-xs text-[var(--color-error)] font-medium">{editErrors.name}</span>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[13px] font-semibold text-[var(--color-on-surface)]">Workspace Slug *</label>
-            <input 
-              required 
-              placeholder="e.g. engineering-team" 
-              value={editSlug} 
-              onChange={e => setEditSlug(e.target.value)}
-              className="px-3 py-2.5 border border-[var(--color-outline)] rounded-[6px] text-sm outline-none focus:border-orange-500"
-            />
-            {editErrors.slug && (
-              <span className="text-xs text-[var(--color-error)] font-medium">{editErrors.slug}</span>
-            )}
-          </div>
-
-          <div className="flex justify-end gap-3 mt-2">
-            <Button variant="outline" onClick={() => setEditingWorkspace(null)} type="button">Cancel</Button>
-            <Button variant="solid" type="submit" loading={isSubmittingEdit}>Save Changes</Button>
-          </div>
-        </form>
-      </Modal>
+      {}
+      <WorkspaceFormModal
+        isOpen={!!editingWorkspace}
+        onClose={() => setEditingWorkspace(null)}
+        title="Edit Workspace"
+        name={editName} onNameChange={setEditName}
+        slug={editSlug} onSlugChange={setEditSlug}
+        errors={editErrors}
+        isSubmitting={isSubmittingEdit}
+        onSubmit={handleUpdate}
+        submitLabel="Save Changes"
+      />
     </div>
-  );
+  )
 }
