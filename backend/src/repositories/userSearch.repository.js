@@ -1,5 +1,4 @@
 import prisma from "../../config/prisma.js";
-
 export const searchUsers = (query, excludeId) => {
   return prisma.user.findMany({
     where: {
@@ -9,7 +8,6 @@ export const searchUsers = (query, excludeId) => {
         { email: { contains: query, mode: "insensitive" } }
       ],
       isVerified:true,
-      
       id: { not: excludeId }
     },
     take: 10,

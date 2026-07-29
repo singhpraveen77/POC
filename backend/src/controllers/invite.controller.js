@@ -1,7 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import * as inviteService from "../services/invite.service.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-
 export const sendInviteController = async (req, res, next) => {
   try {
     const invite = await inviteService.sendInvite(req.user.id, req.params.workspaceId, req.body);
@@ -10,7 +9,6 @@ export const sendInviteController = async (req, res, next) => {
     next(error);
   }
 };
-
 export const getIncomingInvitesController = async (req, res, next) => {
   try {
     const invites = await inviteService.getIncomingInvites(req.user.id);
@@ -19,7 +17,6 @@ export const getIncomingInvitesController = async (req, res, next) => {
     next(error);
   }
 };
-
 export const getOutgoingInvitesController = async (req, res, next) => {
   try {
     const invites = await inviteService.getOutgoingInvites(req.params.workspaceId);
@@ -28,7 +25,6 @@ export const getOutgoingInvitesController = async (req, res, next) => {
     next(error);
   }
 };
-
 export const acceptInviteController = async (req, res, next) => {
   try {
     const result = await inviteService.acceptInvite(req.user.id, req.params.inviteId);
@@ -37,7 +33,6 @@ export const acceptInviteController = async (req, res, next) => {
     next(error);
   }
 };
-
 export const rejectInviteController = async (req, res, next) => {
   try {
     const invite = await inviteService.rejectInvite(req.user.id, req.params.inviteId);
@@ -46,7 +41,6 @@ export const rejectInviteController = async (req, res, next) => {
     next(error);
   }
 };
-
 export const cancelInviteController = async (req, res, next) => {
   try {
     const invite = await inviteService.cancelInvite(req.user.id, req.params.workspaceId, req.params.inviteId);

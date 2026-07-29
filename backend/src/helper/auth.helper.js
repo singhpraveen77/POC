@@ -26,9 +26,4 @@ export const verifyRefreshToken = async (refreshToken) => {
 // on login access and refresh both are generated 
 // access in header payload and refresh in cookies will be saved 
 // when the auth middleware finds the access is expired 
-// it will send the StatusCodes.UNAUTHORIZED unauthorised and will request for the refresh 
-// this will hit the auth/refresh by this the new access token is created and send in the 
-
-
-
-
+// it will send the StatusCodes.UNAUTHORIZED unauthorised and will request for the refresh

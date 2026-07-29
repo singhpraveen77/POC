@@ -1,7 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import * as memberService from "../services/member.service.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-
 export const getMembersController = async (req, res, next) => {
   try {
     const { workspaceId } = req.params;
@@ -11,7 +10,6 @@ export const getMembersController = async (req, res, next) => {
     next(error);
   }
 };
-
 export const changeMemberRoleController = async (req, res, next) => {
   try {
     const requesterId = req.user.id;
@@ -23,7 +21,6 @@ export const changeMemberRoleController = async (req, res, next) => {
     next(error);
   }
 };
-
 export const removeMemberController = async (req, res, next) => {
   try {
     const requesterId = req.user.id;

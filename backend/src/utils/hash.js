@@ -16,4 +16,3 @@ export const hashToken = (token) => {
 export const isMatch = (enteredPassword, storedHashedPassword) => {
   return bcrypt.compare(enteredPassword, storedHashedPassword);
 };
-

@@ -49,4 +49,3 @@ export const authenticateRefreshToken = async (req, res, next) => {
     next(error);
   }
 };
-

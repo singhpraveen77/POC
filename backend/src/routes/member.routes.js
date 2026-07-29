@@ -8,11 +8,8 @@ import {
   changeMemberRoleController,
   removeMemberController
 } from "../controllers/member.controller.js";
-
 const memberRoutes = Router();
-
 memberRoutes.get("/:workspaceId/members", authenticate, requireRole("VIEWER"), getMembersController);
 memberRoutes.patch("/:workspaceId/members/:userId/role", authenticate, requireRole("ADMIN"), validate(changeRoleSchema), changeMemberRoleController);
 memberRoutes.delete("/:workspaceId/members/:userId", authenticate, requireRole("ADMIN"), removeMemberController);
-
 export default memberRoutes;

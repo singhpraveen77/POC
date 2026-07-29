@@ -11,14 +11,10 @@ import {
   rejectInviteController,
   cancelInviteController
 } from "../controllers/invite.controller.js";
-
 export const workspaceInviteRoutes = Router({ mergeParams: true });
-
 workspaceInviteRoutes.post("/", authenticate, requireRole("ADMIN"), validate(sendInviteSchema), sendInviteController);
 workspaceInviteRoutes.get("/outgoing", authenticate, requireRole("ADMIN"), getOutgoingInvitesController);
-
 export const inviteRoutes = Router();
-
 inviteRoutes.get("/incoming", authenticate, getIncomingInvitesController);
 inviteRoutes.patch("/:inviteId/accept", authenticate, acceptInviteController);
 inviteRoutes.patch("/:inviteId/reject", authenticate, rejectInviteController);
