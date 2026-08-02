@@ -9,12 +9,12 @@ export default function ProfileHeader({ user }) {
   const joinedDate = new Date(user.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 
   return (
-    <div className="p-6 flex items-center justify-between gap-6 bg-[var(--color-surface-low)] border border-[var(--color-border)]">
-      <div className="flex items-center gap-5">
+    <div className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 bg-[var(--color-surface-low)] border border-[var(--color-border)]">
+      <div className="flex items-center gap-5 w-full sm:w-auto">
         <div className="rounded-full overflow-hidden shrink-0 border-[3px] border-[var(--color-profile)]">
           <ProfileAvatar size={72} />
         </div>
-        <div>
+        <div className="flex-1 min-w-0">
           <h2 className="m-0 text-[22px] font-bold text-[var(--color-text)]">{user.name}</h2>
           <p className="my-1 text-sm m-0 text-[var(--color-text-muted)]">@{user.username}</p>
           <p className="my-1 text-sm m-0 text-[var(--color-text-muted)]">{user.email}</p>
@@ -27,7 +27,17 @@ export default function ProfileHeader({ user }) {
           </div>
         </div>
       </div>
-      <Button variant="solid" size="md" onClick={() => navigate('/editProfilePage')}>Edit Profile</Button>
+      <Button variant="solid" size="sm" onClick={() => navigate('/editProfilePage')} className="sm:mt-0 mt-2 sm:ml-auto sm:flex items-center gap-2">
+        
+        {/* Mobile: icon only */}
+   <span className="material-symbols-outlined sm:hidden! ">
+    edit
+  </span>
+
+  <span className="hidden sm:inline">
+    Edit Profile
+  </span>
+      </Button>
     </div>
   )
 }
